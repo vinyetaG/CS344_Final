@@ -28,11 +28,11 @@ class Profile extends StatelessWidget {
               child: Column(children: [
                 CircleAvatar(
                   backgroundImage:
-                      const AssetImage('lib/assets/images/798.png'),
+                      const AssetImage('lib/assets/images/bayleef.png'),
                   backgroundColor: Colors.green[300],
                   radius: 100,
                 ),
-                const Text("Clash",
+                const Text("Bayleef",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 25,
