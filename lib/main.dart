@@ -3,9 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'task_list.dart';
-import 'profile.dart';
+import 'profile_signed_in.dart';
 import 'home.dart';
 import 'task_model.dart';
+import 'profile_signed_out.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
@@ -39,7 +40,7 @@ class _TasksAppState extends State<TasksApp> {
       return Home(taskModel: taskModel);
     }),
     Consumer<TaskModel>(builder: (context, taskModel, child) {
-      return Profile(taskModel: taskModel);
+      return ProfileSignedOut(taskModel: taskModel);
     }),
   ];
 
