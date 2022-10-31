@@ -10,8 +10,31 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: Alignment.center,
-      child: const Text('Tab Two'),
-    );
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Text(
+                      textAlign: TextAlign.left,
+                      style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800),
+                      'Home')),
+              const Text(
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 50, color: Colors.white, fontWeight: FontWeight.w400),
+                  'Welcome \nback!'),
+              Container(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: const Text(
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      'You have 4 tasks to complete this week')),
+              const Text(
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  'You have completed 85% of tasks on time.'),
+            ]));
   }
 }
