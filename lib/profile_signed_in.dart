@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'task_model.dart';
 
+//When user is signed in, display profile picture and settings (tbd)
 class ProfileSignedIn extends StatelessWidget {
   final TaskModel taskModel;
   const ProfileSignedIn({required this.taskModel, Key? key}) : super(key: key);
