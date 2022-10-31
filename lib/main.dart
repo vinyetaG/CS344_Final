@@ -12,7 +12,7 @@ void main() {
   runApp(ChangeNotifierProvider(
       create: (context) => TaskModel(),
       child: MaterialApp(
-        title: 'Time Tracker',
+        title: 'Time-Tips',
         home: const TasksApp(),
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch().copyWith(
@@ -33,6 +33,7 @@ class TasksApp extends StatefulWidget {
 class _TasksAppState extends State<TasksApp> {
   int selectedIndex = 0;
   List<Widget> tabViews = [
+    //Change these later to accomodate signed in route
     Consumer<TaskModel>(builder: (context, taskModel, child) {
       return TaskList(taskModel: taskModel);
     }),
@@ -52,6 +53,7 @@ class _TasksAppState extends State<TasksApp> {
 
   @override
   Widget build(BuildContext context) {
+    //3-tabbed app with gray background
     return DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -69,7 +71,7 @@ class _TasksAppState extends State<TasksApp> {
                       label: 'Profile', icon: Icon(Icons.person)),
                 ]),
             appBar: AppBar(
-              title: const Center(child: Text('Time Tracker')),
+              title: const Center(child: Text('Time-Tips')),
             ),
             body: tabViews[selectedIndex]));
   }
