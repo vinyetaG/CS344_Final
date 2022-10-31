@@ -9,33 +9,47 @@ class TaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //ListView of tasks
     return Column(children: [
       Expanded(
-        child: ListView.separated(
-          itemCount: 5, // change this when model method is done
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text('task name'),
-              subtitle: Text('description'),
-              leading: Checkbox(
-                  value: false,
-                  onChanged: ((value) =>
-                      taskModel.toggleSelection(at: index, state: value!))),
-              trailing: Text('timer'),
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const Divider(
-              // i removed color, replace if needed
-              thickness: 1,
-            );
-          },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 25, 10, 0),
+          child: ListView.separated(
+            itemCount: 5, // will be task list length
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                tileColor: Colors.grey[300],
+                shape: RoundedRectangleBorder(
+                    //rounded edge list tile
+                    borderRadius: BorderRadius.circular(20)),
+                title: Text(
+                  'task name',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text('description'),
+                leading: Checkbox(
+                    //When pressed "toggles" that task item
+                    value: false,
+                    onChanged: ((value) =>
+                        taskModel.toggleSelection(at: index, state: value!))),
+                trailing: Text('(timer)'),
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return const Divider(
+                thickness: 1,
+              );
+            },
+          ),
         ),
       ),
+      //Add task button
       const Padding(
-        padding: EdgeInsets.only(bottom: 20),
-        child: FloatingActionButton(onPressed: null, child: Icon(Icons.add)),
-      ),
+          padding: EdgeInsets.fromLTRB(0, 0, 20, 20),
+          child: Align(
+              alignment: Alignment.centerRight,
+              child: FloatingActionButton(
+                  onPressed: null, child: Icon(Icons.add)))),
     ]);
   }
 }
