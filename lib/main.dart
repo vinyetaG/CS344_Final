@@ -12,7 +12,7 @@ void main() {
       create: (context) => TaskModel(),
       child: MaterialApp(
         title: 'Time Tracker',
-        home: const MyApp(),
+        home: const TasksApp(),
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch().copyWith(
             primary: const Color.fromARGB(255, 93, 135, 95),
@@ -22,17 +22,16 @@ void main() {
       )));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class TasksApp extends StatefulWidget {
+  const TasksApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<TasksApp> createState() => _TasksAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _TasksAppState extends State<TasksApp> {
   int selectedIndex = 0;
   List<Widget> tabViews = [
-    //Creates two listeners for the cluans model housing the list of cluans
     Consumer<TaskModel>(builder: (context, taskModel, child) {
       return TaskList(taskModel: taskModel);
     }),
@@ -55,6 +54,7 @@ class _MyAppState extends State<MyApp> {
     return DefaultTabController(
         length: 3,
         child: Scaffold(
+            backgroundColor: Colors.grey[800],
             bottomNavigationBar: BottomNavigationBar(
                 currentIndex: selectedIndex,
                 showUnselectedLabels: true,
@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
                       label: 'Profile', icon: Icon(Icons.person)),
                 ]),
             appBar: AppBar(
-              title: const Text('Time Tracker'),
+              title: const Center(child: Text('Time Tracker')),
             ),
             body: tabViews[selectedIndex]));
   }
