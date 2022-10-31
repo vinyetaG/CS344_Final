@@ -17,15 +17,22 @@ class Home extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 40),
                   child: Text(
                       textAlign: TextAlign.left,
-                      style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w800),
                       'Home')),
               const Text(
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 50, color: Colors.white, fontWeight: FontWeight.w400),
-                  'Welcome \nback!'),
+                  style: TextStyle(
+                      fontSize: 50,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400),
+                  'Welcome \nback!'), //When user is signed in, show username
               Container(
                   padding: const EdgeInsets.only(top: 30),
                   child: const Text(
+                      //These text fields will vary
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white, fontSize: 16),
                       'You have 4 tasks to complete this week')),
