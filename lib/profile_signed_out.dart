@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'task_model.dart';
 
+//Route for when user is logged off prompting for them to log in
 class ProfileSignedOut extends StatelessWidget {
   final TaskModel taskModel;
   const ProfileSignedOut({required this.taskModel, Key? key}) : super(key: key);
@@ -38,11 +39,23 @@ class ProfileSignedOut extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
+                        style: ButtonStyle(
+                            //rounded borders
+                            shape: MaterialStatePropertyAll(
+                                RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(12.0)))),
                         onPressed: null,
                         child: Text("Login",
                             style: TextStyle(color: Colors.grey[200]))),
                     SizedBox(width: 30),
                     ElevatedButton(
+                        //rounded borders
+                        style: ButtonStyle(
+                            shape: MaterialStatePropertyAll(
+                                RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(12.0)))),
                         onPressed: null,
                         child: Text("Sign up",
                             style: TextStyle(color: Colors.grey[200])))
