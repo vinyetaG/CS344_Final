@@ -1,28 +1,32 @@
 // ignore_for_file: unused_import
 
+import 'package:final_project/src/themedata.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 import 'task_list.dart';
 import 'profile_signed_in.dart';
 import 'home.dart';
 import 'task_model.dart';
 import 'profile_signed_out.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(ChangeNotifierProvider(
       create: (context) => TaskModel(),
       child: MaterialApp(
-        title: 'Time-Tips',
-        home: const TasksApp(),
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: const Color.fromARGB(255, 93, 135, 95),
-            secondary: const Color.fromARGB(255, 159, 191, 160),
-          ),
-        ),
-      )));
+          debugShowCheckedModeBanner: false,
+          title: 'Time-Tips',
+          home: const TasksApp(),
+          theme: appTheme)));
 }
 
+//IP: 10.0.2.16
+//Gateway: 10.0.2.2
 class TasksApp extends StatefulWidget {
   const TasksApp({super.key});
 

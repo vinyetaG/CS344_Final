@@ -10,58 +10,35 @@ class ProfileSignedOut extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.only(top: 80),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-              width: 300,
-              height: 330,
-              child: Column(children: [
-                Text("Welcome to Time-Tips!",
-                    style: TextStyle(
-                        fontWeight: (FontWeight.bold),
-                        fontSize: 24,
-                        color: Colors.grey[200]) //set up themes later,
-                    ),
-                Text(
-                  "Please sign in or sign up to get started.",
-                  style: TextStyle(color: Colors.grey[200]),
-                ),
-                Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 30),
-                    child: Image(
-                      image: AssetImage('lib/assets/images/timerIcon.png'),
-                      width: 150,
-                      height: 150,
-                    )),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                        style: ButtonStyle(
-                            //rounded borders
-                            shape: MaterialStatePropertyAll(
-                                RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12.0)))),
-                        onPressed: null,
-                        child: Text("Login",
-                            style: TextStyle(color: Colors.grey[200]))),
-                    SizedBox(width: 30),
-                    ElevatedButton(
-                        //rounded borders
-                        style: ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                                RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12.0)))),
-                        onPressed: null,
-                        child: Text("Sign up",
-                            style: TextStyle(color: Colors.grey[200])))
-                  ],
-                )
-              ])),
-        ));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(
+          height: 50,
+        ),
+        const Text(
+            'Welcome to Time-Tips!\nPlease sign in or sign up to get started.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: (FontWeight.bold),
+              fontSize: 24,
+            )),
+        const Padding(
+            padding: EdgeInsets.symmetric(vertical: 30),
+            child: Image(
+              image: AssetImage('lib/src/assets/images/timerIcon.png'),
+              width: 150,
+              height: 150,
+            )),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(onPressed: null, child: Text('Login')),
+            const SizedBox(width: 30),
+            ElevatedButton(onPressed: null, child: Text('Sign up')),
+          ],
+        )
+      ],
+    );
   }
 }
