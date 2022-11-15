@@ -29,105 +29,90 @@ class _TaskListState extends State<TaskList> {
   ];
 
   ///Opens pop up menu to either add or edit a task
-  void _openTaskMenu(BuildContext context, {required TaskMenu type}) {
-    if (widget.taskModel.popUpMenu == null) {
-      OverlayState overlayState = Overlay.of(context)!;
-      String header;
-      String actionLabel;
-      if (type == TaskMenu.add) {
-        header = 'Create New Task';
-        actionLabel = 'Create Task';
-      } else {
-        header = 'Edit Task';
-        actionLabel = 'Save Changes';
-      }
-      widget.taskModel.popUpMenu = OverlayEntry(
-        builder: (context) {
-          return Positioned(
-              bottom: MediaQuery.of(context).size.height / 10,
-              child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 2,
-                  color: Theme.of(context).colorScheme.secondary,
-                  child: taskMenuBody(context, header, type)));
-        },
-      );
-      overlayState.insert(widget.taskModel.popUpMenu!);
+  Future<void> _openTaskMenu({required TaskMenu type}) async {
+    String header;
+    String actionLabel;
+    if (type == TaskMenu.add) {
+      header = 'Create New Task';
+      actionLabel = 'Create Task';
+    } else {
+      header = 'Edit Task';
+      actionLabel = 'Save Changes';
     }
-  }
-
-  Padding taskMenuBody(BuildContext context, String header, TaskMenu type) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.1,
-          vertical: MediaQuery.of(context).size.height * 0.1),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        //crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            insetPadding: EdgeInsets.all(0),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
             children: [
-              Material(
-                color: Theme.of(context).colorScheme.secondary,
-                child: IconButton(
-                    onPressed: (() => widget.taskModel.removePopUp()),
-                    icon: Icon(Icons.arrow_back_ios_new)),
-              ),
-              Text(
-                header,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              if (type == TaskMenu.edit)
-                Material(
-                  color: Theme.of(context).colorScheme.secondary,
-                  child: IconButton(
-                      onPressed: (() => print(newTaskName)), //test
-                      icon: Icon(Icons.highlight_remove_outlined)),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(12, 24, 24, 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    //crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                              onPressed: (() => Navigator.of(context).pop()),
+                              icon: Icon(Icons.arrow_back_ios_new)),
+                          Text(
+                            header,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          if (type == TaskMenu.edit)
+                            Material(
+                              color: Theme.of(context).colorScheme.secondary,
+                              child: IconButton(
+                                  onPressed: (() => print(newTaskName)), //test
+                                  icon: Icon(Icons.highlight_remove_outlined)),
+                            ),
+                        ],
+                      ),
+                      Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  labelText: 'Task Name',
+                                ),
+                                validator: (text) => text!.isEmpty
+                                    ? 'You must give the task a name.'
+                                    : null,
+                                onSaved: (text) => newTaskName = text!,
+                              ),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  labelText: 'Task Description',
+                                ),
+                                validator: (text) => text!.length > 50
+                                    ? 'Description can be at most 50 characters long.'
+                                    : null,
+                                onSaved: (text) => newTaskDescription = text!,
+                              ),
+                              DropdownButtonFormField<int>(
+                                hint: Text('Priority level'),
+                                items: priorityLevels,
+                                //value: priorityLevels.first.value,
+                                onChanged: (int? newValue) {
+                                  setState(() {
+                                    newPriorityLevel = newValue!;
+                                  });
+                                },
+                              )
+                            ],
+                          )),
+                    ],
+                  ),
                 ),
+              ),
             ],
-          ),
-          Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Material(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Task Name',
-                      ),
-                      validator: (text) => text!.isEmpty
-                          ? 'You must give the task a name.'
-                          : null,
-                      onSaved: (text) => newTaskName = text!,
-                    ),
-                  ),
-                  Material(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Task Description',
-                      ),
-                      validator: (text) => text!.length > 50
-                          ? 'Description can be at most 50 characters long.'
-                          : null,
-                      onSaved: (text) => newTaskDescription = text!,
-                    ),
-                  ),
-                  Material(
-                    child: DropdownButtonFormField<int>(
-                      items: priorityLevels,
-                      value: priorityLevels.first.value,
-                      onChanged: (int? newValue) {
-                        setState(() {
-                          newPriorityLevel = newValue!;
-                        });
-                      },
-                    ),
-                  )
-                ],
-              )),
-        ],
-      ),
-    );
+          );
+        });
   }
 
   @override
@@ -154,7 +139,7 @@ class _TaskListState extends State<TaskList> {
           child: Align(
               alignment: Alignment.centerRight,
               child: FloatingActionButton(
-                  onPressed: (() => _openTaskMenu(context, type: TaskMenu.add)),
+                  onPressed: (() => _openTaskMenu(type: TaskMenu.add)),
                   child: Icon(Icons.add)))),
     ]);
   }
