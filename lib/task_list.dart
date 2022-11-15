@@ -17,9 +17,6 @@ class TaskList extends StatefulWidget {
 
 class _TaskListState extends State<TaskList> {
   final _formKey = GlobalKey<FormState>();
-  late String newTaskName;
-  late String newTaskDescription;
-  int newPriorityLevel = 0;
 
   //Priority levels used by dropdown menu
   List<DropdownMenuItem<int>> priorityLevels = [
@@ -28,10 +25,23 @@ class _TaskListState extends State<TaskList> {
     DropdownMenuItem(value: 2, child: Text("High")),
   ];
 
+  void _addTask(
+      {required String name, String? description, required int priority}) {
+    widget.taskModel.addTask(TaskItem(
+      name: name,
+      description: description,
+      priority: priority,
+    ));
+    Navigator.of(context).pop();
+  }
+
   ///Opens pop up menu to either add or edit a task
   Future<void> _openTaskMenu({required TaskMenu type}) async {
     String header;
     String actionLabel;
+    String? newTaskName;
+    String? newTaskDescription;
+    int? newPriorityLevel;
 
     ///Determines fields that are shown depending on if user is in add or edit
     ///task menu
@@ -87,22 +97,25 @@ class _TaskListState extends State<TaskList> {
                                 validator: (text) => text!.isEmpty
                                     ? 'You must give the task a name.'
                                     : null,
-                                onSaved: (text) => newTaskName = text!,
+                                onChanged: (text) => newTaskName = text,
                               ),
                               SizedBox(height: 15), //whitespace
                               TextFormField(
                                 decoration: InputDecoration(
-                                  labelText: 'Task description',
+                                  labelText: 'Task description (optional)',
                                 ),
                                 validator: (text) => text!.length > 50
                                     ? 'Description can be at most 50 characters long.'
                                     : null,
-                                onSaved: (text) => newTaskDescription = text!,
+                                onChanged: (text) => newTaskDescription = text,
                               ),
                               SizedBox(height: 15), //whitespace
                               DropdownButtonFormField<int>(
                                 hint: Text('Priority level'),
                                 items: priorityLevels,
+                                validator: (value) => value == null
+                                    ? 'Please set a valid priority level for this task.'
+                                    : null,
                                 //value: priorityLevels.first.value,
                                 onChanged: (int? newValue) {
                                   setState(() {
@@ -118,7 +131,15 @@ class _TaskListState extends State<TaskList> {
                           width: MediaQuery.of(context).size.width * 0.8,
                           height: MediaQuery.of(context).size.width * 0.10,
                           child: ElevatedButton(
-                              onPressed: null, child: Text(actionLabel)))
+                              onPressed: ((() {
+                                if (_formKey.currentState!.validate()) {
+                                  _addTask(
+                                      name: newTaskName!,
+                                      description: newTaskDescription,
+                                      priority: newPriorityLevel!);
+                                }
+                              })),
+                              child: Text(actionLabel)))
                     ],
                   ),
                 ),
