@@ -32,6 +32,9 @@ class _TaskListState extends State<TaskList> {
   Future<void> _openTaskMenu({required TaskMenu type}) async {
     String header;
     String actionLabel;
+
+    ///Determines fields that are shown depending on if user is in add or edit
+    ///task menu
     if (type == TaskMenu.add) {
       header = 'Create New Task';
       actionLabel = 'Create Task';
@@ -63,11 +66,12 @@ class _TaskListState extends State<TaskList> {
                             header,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
+                          //Delete task button is shown if in the edit menu
                           if (type == TaskMenu.edit)
                             Material(
                               color: Theme.of(context).colorScheme.secondary,
                               child: IconButton(
-                                  onPressed: (() => print(newTaskName)), //test
+                                  onPressed: null,
                                   icon: Icon(Icons.highlight_remove_outlined)),
                             ),
                         ],
@@ -78,22 +82,24 @@ class _TaskListState extends State<TaskList> {
                             children: [
                               TextFormField(
                                 decoration: InputDecoration(
-                                  labelText: 'Task Name',
+                                  labelText: 'Task name',
                                 ),
                                 validator: (text) => text!.isEmpty
                                     ? 'You must give the task a name.'
                                     : null,
                                 onSaved: (text) => newTaskName = text!,
                               ),
+                              SizedBox(height: 15), //whitespace
                               TextFormField(
                                 decoration: InputDecoration(
-                                  labelText: 'Task Description',
+                                  labelText: 'Task description',
                                 ),
                                 validator: (text) => text!.length > 50
                                     ? 'Description can be at most 50 characters long.'
                                     : null,
                                 onSaved: (text) => newTaskDescription = text!,
                               ),
+                              SizedBox(height: 15), //whitespace
                               DropdownButtonFormField<int>(
                                 hint: Text('Priority level'),
                                 items: priorityLevels,
@@ -103,9 +109,16 @@ class _TaskListState extends State<TaskList> {
                                     newPriorityLevel = newValue!;
                                   });
                                 },
-                              )
+                              ),
+                              SizedBox(height: 30), //whitespace
                             ],
                           )),
+                      Container(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          height: MediaQuery.of(context).size.width * 0.10,
+                          child: ElevatedButton(
+                              onPressed: null, child: Text(actionLabel)))
                     ],
                   ),
                 ),
