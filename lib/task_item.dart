@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:final_project/src/themedata.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -10,6 +11,12 @@ class TaskItem extends StatefulWidget {
   int priority;
   DateTime? dueDate;
   bool isOverdue = false;
+
+  static List<Color?> tileColors = [
+    Colors.grey[300],
+    appTheme.colorScheme.secondary,
+    appTheme.colorScheme.primary
+  ];
 
   TaskItem(
       {super.key,
@@ -22,11 +29,14 @@ class TaskItem extends StatefulWidget {
   State<TaskItem> createState() => _TaskItemState();
 }
 
+void _editItem() {}
+
 class _TaskItemState extends State<TaskItem> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      tileColor: Colors.grey[300],
+      onTap: null,
+      tileColor: TaskItem.tileColors[widget.priority],
       shape: RoundedRectangleBorder(
           //rounded edge list tile
           borderRadius: BorderRadius.circular(20)),
