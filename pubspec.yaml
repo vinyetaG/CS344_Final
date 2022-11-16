@@ -39,6 +39,9 @@ dependencies:
   provider: ^6.0.4
   firebase_core: ^2.2.0
   cloud_firestore: ^4.0.5
+  firebase_auth: ^4.1.2
+  sliding_up_panel: ^2.0.0+1
+  sliding_switch: ^1.1.0
 
 dev_dependencies:
   flutter_test:
