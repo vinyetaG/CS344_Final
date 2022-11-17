@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'task_model.dart';
 
 enum TaskMenu { add, edit }
+enum Sort { priority, due }
 
 class TaskList extends StatefulWidget {
   final TaskModel taskModel;
@@ -33,6 +34,14 @@ class _TaskListState extends State<TaskList> {
       priority: priority,
     ));
     Navigator.of(context).pop();
+  }
+  
+  void _sortBy(Sort sort) {
+    if (sort == Sort.priority) {
+      widget.taskModel.sortByPriority();
+    } else if (sort == Sort.due) {
+      widget.taskModel.sortByDue();
+    }
   }
 
   ///Opens pop up menu to either add or edit a task
@@ -153,6 +162,16 @@ class _TaskListState extends State<TaskList> {
   Widget build(BuildContext context) {
     //ListView of tasks
     return Column(children: [
+      Padding(padding: EdgeInsets.all(10)),
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        ElevatedButton(
+            onPressed: (() => _sortBy(Sort.priority)),
+            child: Text("Sort by priority")),
+        Padding(padding: EdgeInsets.all(10)),
+        ElevatedButton(
+            onPressed: (() => _sortBy(Sort.due)),
+            child: Text("Sort by due date"))
+      ]),//
       Expanded(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 25, 10, 0),
