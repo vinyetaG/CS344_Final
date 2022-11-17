@@ -37,4 +37,16 @@ class TaskModel extends ChangeNotifier {
     _taskList.removeAt(index);
     notifyListeners();
   }
+  
+  //Sorts by priority
+  void sortByPriority() {
+    _taskList.sort((a, b) => a.priority.compareTo(b.priority));
+    notifyListeners();
+  }
+
+  //Sorts by due date
+  void sortByDue() {
+    //_taskList.sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
+    notifyListeners();
+  }
 }
