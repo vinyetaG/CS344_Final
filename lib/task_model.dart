@@ -40,7 +40,7 @@ class TaskModel extends ChangeNotifier {
   
   //Sorts by priority
   void sortByPriority() {
-    _taskList.sort((a, b) => a.priority.compareTo(b.priority));
+    _taskList.sort((a, b) => b.priority.compareTo(a.priority));
     notifyListeners();
   }
 
