@@ -2,10 +2,10 @@
 
 import 'package:final_project/profile_signed_in.dart';
 import 'package:flutter/material.dart';
+import 'package:sliding_switch/sliding_switch.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'task_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sliding_switch/sliding_switch.dart';
 
 //Route for when user is logged off prompting for them to log in
 // ignore: must_be_immutable
@@ -18,71 +18,21 @@ class ProfileSignedOut extends StatefulWidget {
 }
 
 class _ProfileSignedOutState extends State<ProfileSignedOut> {
-  // VARIABLES
+  // Form key
   final _loginKey = GlobalKey<FormState>();
-  // ignore: avoid_init_to_null
-  static User? user = null;
 
+  // Text controllers
   final TextEditingController emailCtrl = TextEditingController();
   final TextEditingController passwordCtrl = TextEditingController();
 
-  final TextEditingController newEmailCtrl = TextEditingController();
-  final TextEditingController nameCtrl = TextEditingController();
-  final TextEditingController newPasswordCtrl = TextEditingController();
+  // Login / signup panel
+  final PanelController controller = PanelController();
+  
+  // Firebase user status
+  User? user = FirebaseAuth.instance.currentUser;
 
-  // NEW: _logIn() logs the user in on button press.
-  Future<User?> logInUsingEmailPassword({
-    required String email,
-    required String password,
-  }) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? user;
-    try {
-      // NEW: Save user credentials from information entered by user
-      UserCredential userCreds = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      user = userCreds.user;
-    } on FirebaseAuthException catch (e) {
-      // TO-DO: Convert print statements into a snackbar notification.
-      if (e.code == 'user-not-found') {
-        // ignore: avoid_print
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        // ignore: avoid_print
-        print('Wrong password provided for that user.');
-      }
-    }
-    _ProfileSignedOutState.user = user;
-    return user;
-  }
-
-  Future<User?> createUserWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? user;
-    try {
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      user = userCredential.user;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        // ignore: avoid_print
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        // ignore: avoid_print
-        print('The account already exists for that email.');
-      } else {
-        // ignore: avoid_print
-        print(e);
-      }
-    }
-    _ProfileSignedOutState.user = user;
-    return user;
-  }
-
-  Widget? _openForm({required PanelController controller}) {
+  Widget _openForm(
+      {required PanelController controller, required BuildContext context}) {
     String type = 'login';
     return Form(
         key: _loginKey,
@@ -116,7 +66,7 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
             inactiveColor: Colors.white,
           ),
           TextFormField(
-            decoration: InputDecoration(hintText: 'Email'),
+            decoration: const InputDecoration(hintText: 'Email'),
             controller: emailCtrl,
             obscureText: false,
             validator: (email) {
@@ -127,7 +77,7 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
             },
           ),
           TextFormField(
-            decoration: InputDecoration(hintText: 'Password'),
+            decoration: const InputDecoration(hintText: 'Password'),
             controller: passwordCtrl,
             obscureText: true,
             validator: (password) {
@@ -138,59 +88,43 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
             },
           ),
           ElevatedButton(
-              onPressed: (() {
+              onPressed: (() async {
                 if (_loginKey.currentState!.validate()) {
                   _loginKey.currentState!.save();
-
+                  UserCredential userCred;
                   // If user does not have an account, create one
-                  String snackBarText = '';
-                  SnackBar snackBar = SnackBar(content: Text(snackBarText));
-
                   if (type == 'signup') {
-                    snackBarText = 'Now creating your Time-Tips Account...';
-                    setState(() {
-                      createUserWithEmailAndPassword(
-                        email: emailCtrl.text,
-                        password: passwordCtrl.text,
-                      );
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    userCred = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                            email: emailCtrl.text, password: passwordCtrl.text);
+                    user = userCred.user;
                   }
-
-                  snackBarText = 'Logging into Time-tips...';
-                  snackBar = SnackBar(content: Text(snackBarText));
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
                   // Login to account
-                  logInUsingEmailPassword(
-                    email: emailCtrl.text,
-                    password: passwordCtrl.text,
-                  ).then((_) {
-                    setState(() {
-                      build(context);
-                    });
-                  }).then((_) => controller.close());
+                  userCred = await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: emailCtrl.text, password: passwordCtrl.text);
+
+                  user = userCred.user;
                 }
+
+                // Rebuild page to match user state
+                setState(() => build(context));
               }),
               child: const Text('Submit'))
         ]));
   }
 
-// NEW: logIn is the screen that will be shown under profile navigation if the user
-// has not yet logged in.
-  Widget logIn() {
-    PanelController controller = PanelController();
-
+  Widget logInSignUpPanel() {
     return SlidingUpPanel(
         defaultPanelState: PanelState.CLOSED,
         controller: controller,
         minHeight: 0,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         panel: Center(
           child: Container(
-              padding: EdgeInsets.fromLTRB(50, 10, 50, 20),
-              child: _openForm(controller: controller)),
+              padding: const EdgeInsets.fromLTRB(50, 10, 50, 20),
+              child: _openForm(controller: controller, context: context)),
         ),
         body: Column(children: [
           const SizedBox(
@@ -216,17 +150,8 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
               ElevatedButton(
                   onPressed: (() {
                     controller.open();
-                    _openForm(controller: controller);
                   }),
-                  child: Text('Login')),
-              const SizedBox(width: 30),
-              ElevatedButton(
-                  onPressed: (() async {
-                    controller
-                        .open()
-                        .then((_) => _openForm(controller: controller));
-                  }),
-                  child: Text('Sign up')),
+                  child: const Text('Log In or Sign Up')),
             ],
           )
         ]));
@@ -234,10 +159,8 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
 
   @override
   Widget build(BuildContext context) {
-    // If user is null, login has not occured. Return login screen.
-    // Else return profile logged in screen.
     return (user == null)
-        ? logIn()
+        ? logInSignUpPanel()
         : ProfileSignedIn(taskModel: widget.taskModel);
   }
 }
