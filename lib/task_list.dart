@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'task_model.dart';
 
 enum TaskMenu { add, edit }
-enum Sort { priority, due }
 
 class TaskList extends StatefulWidget {
   final TaskModel taskModel;
@@ -35,17 +34,9 @@ class _TaskListState extends State<TaskList> {
     ));
     Navigator.of(context).pop();
   }
-  
-  void _sortBy(Sort sort) {
-    if (sort == Sort.priority) {
-      widget.taskModel.sortByPriority();
-    } else if (sort == Sort.due) {
-      widget.taskModel.sortByDue();
-    }
-  }
 
   ///Opens pop up menu to either add or edit a task
-  Future<void> _openTaskMenu({required TaskMenu type}) async {
+  Future<void> openTaskMenu({required TaskMenu type}) async {
     String header;
     String actionLabel;
     String? newTaskName;
@@ -162,38 +153,40 @@ class _TaskListState extends State<TaskList> {
   Widget build(BuildContext context) {
     //ListView of tasks
     return Column(children: [
-      Padding(padding: EdgeInsets.all(10)),
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        ElevatedButton(
-            onPressed: (() => _sortBy(Sort.priority)),
-            child: Text("Sort by priority")),
-        Padding(padding: EdgeInsets.all(10)),
-        ElevatedButton(
-            onPressed: (() => _sortBy(Sort.due)),
-            child: Text("Sort by due date"))
-      ]),//
       Expanded(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 25, 10, 0),
-          child: ListView.separated(
-            itemCount: widget.taskModel.numTasks(),
-            itemBuilder: (BuildContext context, int index) {
-              return widget.taskModel.getTask(index);
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return Divider(thickness: 1, color: Colors.grey[800]);
-            },
+        child: ListView.separated(
+          padding: EdgeInsets.all(
+            MediaQuery.of(context).size.width * 0.04,
           ),
+          itemCount: widget.taskModel.numTasks(),
+          itemBuilder: (BuildContext context, int index) {
+            return widget.taskModel.getTask(index);
+          },
+          separatorBuilder: (BuildContext context, int index) {
+            return Divider(
+                thickness: 1, color: Theme.of(context).scaffoldBackgroundColor);
+          },
         ),
       ),
-      //Add task button
-      Padding(
-          padding: EdgeInsets.fromLTRB(0, 0, 20, 20),
-          child: Align(
-              alignment: Alignment.centerRight,
+
+      ///Provides positioning for floating action button prevents it from
+      ///obfuscating list tile info
+      Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        width: MediaQuery.of(context).size.width,
+        child: Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                  0,
+                  MediaQuery.of(context).size.height * 0.045,
+                  MediaQuery.of(context).size.width * 0.04,
+                  MediaQuery.of(context).size.height * 0.03),
               child: FloatingActionButton(
-                  onPressed: (() => _openTaskMenu(type: TaskMenu.add)),
-                  child: Icon(Icons.add)))),
+                  onPressed: (() => openTaskMenu(type: TaskMenu.add)),
+                  child: Icon(Icons.add)),
+            )),
+      ),
     ]);
   }
 }
