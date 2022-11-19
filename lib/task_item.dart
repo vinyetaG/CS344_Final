@@ -2,6 +2,7 @@
 
 import 'package:final_project/src/themedata.dart';
 import 'package:flutter/material.dart';
+import 'task_model.dart';
 
 // ignore: must_be_immutable
 class TaskItem extends StatefulWidget {
@@ -29,8 +30,6 @@ class TaskItem extends StatefulWidget {
   State<TaskItem> createState() => _TaskItemState();
 }
 
-void _editItem() {}
-
 class _TaskItemState extends State<TaskItem> {
   @override
   Widget build(BuildContext context) {
@@ -48,12 +47,45 @@ class _TaskItemState extends State<TaskItem> {
       leading: Checkbox(
           //When pressed "toggles" this task item
           value: widget.selected,
-          onChanged: (bool? value) {
+          onChanged: (bool? value) async {
             setState(() {
               widget.selected = value!;
             });
           }),
-      trailing: Text('(timer)'),
+      onLongPress: () async {
+        bool? delete = await showDeleteConfirmDialog1();
+        if (delete == null) {
+        } else {
+          print("confirm");
+          //... 删除文件
+        }
+      },
+      trailing: Text('timer'),
+    );
+  }
+
+  Future<bool?> showDeleteConfirmDialog1() {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("hint"),
+          content: Text("Confirm you delete the item"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("cancel"),
+              onPressed: () => Navigator.of(context).pop(), // 关闭对话框
+            ),
+            TextButton(
+              child: Text('delete'),
+              onPressed: () {
+                //关闭对话框并返回true
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
