@@ -45,7 +45,9 @@ class _ProfileSignedInState extends State<ProfileSignedIn> {
             color: Colors.grey[800],
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [AppBar(
+                title: Center(child: Text('Time-Tips')),
+              ),
               const Text("Profile",
                   style: TextStyle(
                       color: Colors.white,
