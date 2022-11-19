@@ -127,6 +127,9 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
               child: _openForm(controller: controller, context: context)),
         ),
         body: Column(children: [
+          AppBar(
+            title: Center(child: Text('Time-Tips')),
+          ),
           const SizedBox(
             height: 50,
           ),
