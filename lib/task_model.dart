@@ -49,4 +49,10 @@ class TaskModel extends ChangeNotifier {
     //_taskList.sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
     notifyListeners();
   }
+
+  //Sorts by most recently added
+  void sortByName() {
+    _taskList.sort((a, b) => a.name.compareTo(b.name));
+    notifyListeners();
+  }
 }
