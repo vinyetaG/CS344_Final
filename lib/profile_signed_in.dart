@@ -45,7 +45,8 @@ class _ProfileSignedInState extends State<ProfileSignedIn> {
             color: Colors.grey[800],
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [AppBar(
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              AppBar(
                 title: Center(child: Text('Time-Tips')),
               ),
               const Text("Profile",
@@ -201,7 +202,19 @@ class _ProfileSignedInState extends State<ProfileSignedIn> {
                         // TO-DO: TO BE CONTINUED
                       ]),
                     )),
-              ])
+              ]),
+              Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: const EdgeInsets.symmetric(vertical: 50),
+                  child: ElevatedButton(
+                      // LOG-OUT BUTTOON
+                      onPressed: (() async {
+                        final FirebaseAuth auth = FirebaseAuth.instance;
+                        await auth.signOut();
+                        user = null;
+                        setState(() => build(context));
+                      }),
+                      child: const Text('Log Out'))),
             ])));
   }
 
