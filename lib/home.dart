@@ -6,10 +6,10 @@ class Home extends StatelessWidget {
   const Home({required this.taskModel, Key? key}) : super(key: key);
 
   @override
- Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Center(child: Text('Time-Tips')),
+          title: const Center(child: Text('Home')),
         ),
         body: Container(
             padding: const EdgeInsets.symmetric(horizontal: 30),

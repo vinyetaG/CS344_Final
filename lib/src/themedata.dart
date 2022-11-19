@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+///Provides theme info for Time-Tips
 ThemeData appTheme = ThemeData(
     colorScheme: ColorScheme.fromSwatch().copyWith(
       primary: const Color.fromARGB(255, 93, 135, 95),
@@ -7,7 +8,6 @@ ThemeData appTheme = ThemeData(
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-            //rounded borders
             shape: MaterialStatePropertyAll(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0))),
             foregroundColor: MaterialStatePropertyAll(Colors.grey[200]))),
@@ -21,7 +21,7 @@ ThemeData appTheme = ThemeData(
         // ignore: body_might_complete_normally_nullable
         fillColor: MaterialStateProperty.resolveWith((var states) {
       if (states.contains(MaterialState.selected)) {
-        return const Color.fromARGB(255, 93, 135, 95);
+        return appTheme.colorScheme.primary;
       }
     })),
     scaffoldBackgroundColor: Colors.grey[800]);

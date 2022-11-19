@@ -27,7 +27,7 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
 
   // Login / signup panel
   final PanelController controller = PanelController();
-  
+
   // Firebase user status
   User? user = FirebaseAuth.instance.currentUser;
 
@@ -128,13 +128,13 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
         ),
         body: Column(children: [
           AppBar(
-            title: Center(child: Text('Time-Tips')),
+            title: Center(child: Text('Login')),
           ),
           const SizedBox(
             height: 50,
           ),
           const Text(
-              'Welcome to Time-Tips!\nPlease sign in or sign up to get started.',
+              'Welcome to Time-Tips!\nPlease log in or sign up to get started.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: (FontWeight.bold),
@@ -167,4 +167,3 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
         : ProfileSignedIn(taskModel: widget.taskModel);
   }
 }
-

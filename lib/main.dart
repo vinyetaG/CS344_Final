@@ -51,7 +51,6 @@ class _TasksAppState extends State<TasksApp> {
   ];
 
   void _handleTap(int index) {
-    widget.taskModel.removePopUp();
     setState(() {
       selectedIndex = index;
     });

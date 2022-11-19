@@ -47,7 +47,7 @@ class _ProfileSignedInState extends State<ProfileSignedIn> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               AppBar(
-                title: Center(child: Text('Time-Tips')),
+                title: Center(child: Text('Profile')),
               ),
               const Text("Profile",
                   style: TextStyle(
