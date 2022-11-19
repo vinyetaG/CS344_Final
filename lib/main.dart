@@ -75,9 +75,6 @@ class _TasksAppState extends State<TasksApp> {
                   BottomNavigationBarItem(
                       label: 'Profile', icon: Icon(Icons.person)),
                 ]),
-            appBar: AppBar(
-              title: const Center(child: Text('Time-Tips')),
-            ),
             body: tabViews[selectedIndex]));
   }
 }
