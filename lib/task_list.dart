@@ -28,6 +28,7 @@ class _TaskListState extends State<TaskList> {
         actions: [
           //Popup menu that has sorting options
           PopupMenuButton<String>(
+              padding: EdgeInsets.only(right: 20),
               icon: Icon(Icons.menu),
               onSelected: (String sortOption) {
                 setState(() {
@@ -77,29 +78,31 @@ class _TaskListState extends State<TaskList> {
               }
               //List tile containing info for each task
               return ListTile(
-                onTap: (() => //Show full info on task
-                    widget.taskModel
-                        .openInfoPanel(context, taskItem: currTask)),
-                tileColor: TaskItem.tileColors[currTask.priority],
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-                title: Text(
-                  currTask.name,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(descriptionPrev ?? ""),
-                leading: Checkbox(
-                    //If user checks off the item, prompt completion
-                    value: currTask.selected,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        currTask.selected = true;
-                      });
+                  onTap: (() => //Show full info on task
                       widget.taskModel
-                          .confirmCompletion(context, taskItem: currTask);
-                    }),
-                trailing: Text('(timer)'),
-              );
+                          .openInfoPanel(context, taskItem: currTask)),
+                  //If task is overdue, red. Else darker green depending on priority
+                  tileColor: currTask.isOverdue
+                      ? TaskItem.tileColors[3]
+                      : TaskItem.tileColors[currTask.priority],
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  title: Text(
+                    currTask.name,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(descriptionPrev ?? ""),
+                  leading: Checkbox(
+                      //If user checks off the item, prompt completion
+                      value: currTask.selected,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          currTask.selected = true;
+                        });
+                        widget.taskModel
+                            .confirmCompletion(context, taskItem: currTask);
+                      }),
+                  trailing: currTask.timer);
             },
             separatorBuilder: (BuildContext context, int index) {
               return Divider(

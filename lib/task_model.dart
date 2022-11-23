@@ -20,7 +20,6 @@ class TaskModel extends ChangeNotifier {
     const DropdownMenuItem(value: 1, child: Text("Medium")),
     const DropdownMenuItem(value: 2, child: Text("High")),
   ];
-  final _formKey = GlobalKey<FormState>();
 
   ///Returns the task at the given index of the task list
   TaskItem getTask(int index) {
@@ -98,7 +97,7 @@ class TaskModel extends ChangeNotifier {
                           //Due date and timer
                           Text('Do by: <date>',
                               style: Theme.of(context).textTheme.titleLarge),
-                          const Text('(timer)', style: TextStyle(fontSize: 36))
+                          taskItem.timer
                         ],
                       ),
                       const SizedBox(height: 20), //whitespace
@@ -131,6 +130,7 @@ class TaskModel extends ChangeNotifier {
           TextButton(
             onPressed: () {
               _taskList.remove(taskItem);
+              notifyListeners();
               for (int i = 0; i < 3; i++) {
                 Navigator.pop(context);
               }
@@ -180,7 +180,7 @@ class TaskModel extends ChangeNotifier {
       throw ArgumentError(
           "Edit menu was called without providing the task item to be edited.");
     }
-
+    final _formKey = GlobalKey<FormState>();
     String header, actionLabel;
     String? newTaskName, newTaskDescription, currTaskName, currTaskDescription;
     int? newPriorityLevel, currPriorityLevel;
