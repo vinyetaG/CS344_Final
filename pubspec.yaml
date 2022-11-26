@@ -43,6 +43,10 @@ dependencies:
   sliding_up_panel: ^2.0.0+1
   sliding_switch: ^1.1.0
   stop_watch_timer:
+  image_picker:
+  analog_clock:
+  firebase: ^9.0.3
+  firebase_storage:
 
 dev_dependencies:
   flutter_test:
