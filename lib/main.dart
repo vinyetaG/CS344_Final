@@ -6,10 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'src/firebase_options.dart';
 import 'task_list.dart';
-import 'profile_signed_in.dart';
 import 'home.dart';
 import 'task_model.dart';
-import 'profile_signed_out.dart';
+import 'Profile/profile_launch_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +45,7 @@ class _TasksAppState extends State<TasksApp> {
       return Home(taskModel: taskModel);
     }),
     Consumer<TaskModel>(builder: (context, taskModel, child) {
-      return ProfileSignedOut(taskModel: taskModel);
+      return ProfileLaunchScreen(taskModel: taskModel);
     }),
   ];
 
