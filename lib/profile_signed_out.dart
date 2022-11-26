@@ -1,5 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
+/*
 import 'package:final_project/profile_signed_in.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_switch/sliding_switch.dart';
@@ -167,3 +167,4 @@ class _ProfileSignedOutState extends State<ProfileSignedOut> {
         : ProfileSignedIn(taskModel: widget.taskModel);
   }
 }
+*/
