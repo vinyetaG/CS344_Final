@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import '../task_model.dart';
 //import 'package:final_project/src/themedata.dart';
 
@@ -14,161 +14,211 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   // Text controllers
-  final TextEditingController emailCtrl = TextEditingController();
-  final TextEditingController passwordCtrl = TextEditingController();
+  final TextEditingController _emailCtrl = TextEditingController();
+  final TextEditingController _passwordCtrl = TextEditingController();
 
   // Firebase user status
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  // TODO: Implement profile picture
-  // TODO: Implement settings fields
-  // TODO: OPTIONAL - Redesign card once elements are working?
-  // TODO: Something is wrong with my text fields. They're centered but only in certain window sizes... not sure why they won't center right :(((
+  final GlobalKey<FormState> _loginKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
+    // TextFormField sizing
+    double elementHeight = MediaQuery.of(context).size.height * 0.07;
+    double elementWidth = MediaQuery.of(context).size.width * 0.6;
+    double elementRadius = 30;
+    double leftPadding = 20;
+
     return Scaffold(
+        appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            flexibleSpace: Container(
+                decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: [
+                    Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+                  ]),
+            )),
+            actions: [
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.question_mark_rounded))
+            ]),
         body: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Center(
-                child: Column(children: [
-              const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 30),
-                  child: Image(
-                    image: AssetImage('lib/src/assets/images/timerIcon.png'),
-                    width: 100,
-                    height: 100,
-                  )),
-              const Text('Welcome to Time-Tips!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: (FontWeight.bold),
-                    fontSize: 24,
-                  )),
+            padding: EdgeInsets.fromLTRB(
+                30, MediaQuery.of(context).size.height * 0.2, 30, 30),
+            child: Column(children: [
+              Container(
+                width: MediaQuery.of(context).size.width * 0.6,
+                alignment: Alignment.topLeft,
+                child: const Text(
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    'Welcome,'),
+              ),
+              Container(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  alignment: Alignment.topLeft,
+                  child: const Text(
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      'Please sign in to continue.')),
               const SizedBox(height: 20),
-              SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: loginForm(
-                      context: context,
-                      emailCtrl: emailCtrl,
-                      passwordCtrl: passwordCtrl)),
+              Form(
+                key: _loginKey,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Email Field
+                      Stack(alignment: Alignment.topCenter, children: [
+                        // Opaque Background
+                        Container(
+                          alignment: Alignment.topCenter,
+                          height: elementHeight,
+                          width: elementWidth,
+                          decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              borderRadius:
+                                  BorderRadius.circular(elementRadius),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 25,
+                                    spreadRadius: -5)
+                              ]),
+                        ),
+                        // Textfield Container (Shows validation below opaque area)
+                        Container(
+                            alignment: Alignment.topCenter,
+                            padding: EdgeInsets.only(left: leftPadding),
+                            height: elementHeight * 1.5,
+                            width: elementWidth,
+                            child: TextFormField(
+                              style: const TextStyle(color: Colors.white),
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintStyle: TextStyle(color: Colors.white),
+                                  hintText: 'Email'),
+                              controller: _emailCtrl,
+                              obscureText: false,
+                              validator: (email) {
+                                if (email == null || email.isEmpty) {
+                                  return 'Please enter an email address';
+                                }
+                                return null;
+                              },
+                            ))
+                      ]),
+
+                      // Password Field
+                      Stack(alignment: Alignment.topCenter, children: [
+                        // Opaque Background
+                        Container(
+                          alignment: Alignment.topCenter,
+                          height: elementHeight,
+                          width: elementWidth,
+                          decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              borderRadius:
+                                  BorderRadius.circular(elementRadius),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 25,
+                                    spreadRadius: -5)
+                              ]),
+                        ),
+
+                        // Textfield Container (Shows validation below opaque area)
+                        Container(
+                            alignment: Alignment.topCenter,
+                            padding: EdgeInsets.only(left: leftPadding),
+                            height: elementHeight * 1.5,
+                            width: elementWidth,
+                            child: TextFormField(
+                              style: const TextStyle(color: Colors.white),
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintStyle: TextStyle(color: Colors.white),
+                                  hintText: 'Password'),
+                              controller: _passwordCtrl,
+                              obscureText: true,
+                              validator: (password) {
+                                if (password == null || password.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                return null;
+                              },
+                            )),
+                      ]),
+
+                      const SizedBox(height: 10),
+
+                      SizedBox(
+                          height: elementHeight,
+                          width: elementWidth,
+                          child: MaterialButton(
+                            onPressed: (() async {
+                              if (_loginKey.currentState!.validate()) {
+                                _loginKey.currentState!.save();
+
+                                // Login to account
+                                try {
+                                  await FirebaseAuth.instance
+                                      .signInWithEmailAndPassword(
+                                          email: _emailCtrl.text,
+                                          password: _passwordCtrl.text);
+                                } on FirebaseAuthException catch (e) {
+                                  String loginError = e.message.toString();
+                                  SnackBar errorMessage =
+                                      SnackBar(content: Text(loginError));
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(errorMessage);
+                                }
+                              }
+                            }),
+                            splashColor: Colors.black12,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(elementRadius),
+                            ),
+                            child: Ink(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: <Color>[
+                                      Theme.of(context).colorScheme.primary,
+                                      Theme.of(context).colorScheme.secondary
+                                    ]),
+                                borderRadius:
+                                    BorderRadius.circular(elementRadius),
+                              ),
+                              child: Container(
+                                  alignment: Alignment.center,
+                                  child: const Text(
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                      'Sign In')),
+                            ),
+                          )),
+                    ]),
+              ),
               const SizedBox(height: 10),
               registerBar(widget.taskModel, context),
-            ]))));
+            ])));
   }
-}
-
-Widget loginForm(
-    {required BuildContext context,
-    required TextEditingController emailCtrl,
-    required TextEditingController passwordCtrl}) {
-  // Form key
-  // ignore: no_leading_underscores_for_local_identifiers
-  final _loginKey = GlobalKey<FormState>();
-  return Form(
-      key: _loginKey,
-      child:
-          Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        Stack(children: [
-          Container(
-            height: 50,
-            width: 450,
-            padding: const EdgeInsets.only(bottom: 5, left: 20),
-            decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(30)),
-          ),
-          Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: TextFormField(
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.white),
-                    hintText: 'Email'),
-                controller: emailCtrl,
-                obscureText: false,
-                validator: (email) {
-                  if (email == null || email.isEmpty) {
-                    return 'Please enter an email address';
-                  }
-                  return null;
-                },
-              ))
-        ]),
-        Stack(children: [
-          Container(
-            height: 50,
-            width: 450,
-            decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(30)),
-          ),
-          Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: TextFormField(
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.white),
-                    hintText: 'Password'),
-                controller: passwordCtrl,
-                obscureText: true,
-                validator: (password) {
-                  if (password == null || password.isEmpty) {
-                    return 'Please enter a password';
-                  }
-                  return null;
-                },
-              )),
-        ]),
-        const SizedBox(height: 10),
-        SizedBox(
-            height: 50,
-            width: 450,
-            child: MaterialButton(
-              onPressed: (() async {
-                if (_loginKey.currentState!.validate()) {
-                  _loginKey.currentState!.save();
-
-                  // Login to account
-                  try {
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
-                        email: emailCtrl.text, password: passwordCtrl.text);
-                  } on FirebaseAuthException catch (e) {
-                    String loginError = e.message.toString();
-                    SnackBar errorMessage = SnackBar(content: Text(loginError));
-                    ScaffoldMessenger.of(context).showSnackBar(errorMessage);
-                  }
-                }
-              }),
-              splashColor: Colors.black12,
-              padding: const EdgeInsets.all(0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(32.0),
-              ),
-              child: Ink(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: <Color>[
-                        Theme.of(context).colorScheme.primary,
-                        Theme.of(context).colorScheme.secondary
-                      ]),
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                child: Container(
-                    alignment: Alignment.center,
-                    child: const Text(
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
-                        'Login')),
-              ),
-            )),
-      ]));
 }
 
 Widget registerBar(taskModel, context) {
