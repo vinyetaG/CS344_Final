@@ -61,6 +61,10 @@ class TaskModel extends ChangeNotifier {
     const DropdownMenuItem(value: 1, child: Text("Medium")),
     const DropdownMenuItem(value: 2, child: Text("High")),
   ];
+  
+  // Lists of tasks completed on time and late
+  final _completedTasks = <TaskItem>[];
+  final _lateTasks = <TaskItem>[];
 
   ///Returns the task at the given index of the task list
   TaskItem getTask(int index) {
@@ -76,6 +80,17 @@ class TaskModel extends ChangeNotifier {
   void removeTask(int index) {
     _taskList.removeAt(index);
     notifyListeners();
+  }
+  
+  // Calculates the % of tasks completed on time
+  double tasksOnTime() {
+    if (_lateTasks.isEmpty) {
+      return 100;
+    } else {
+      return (_completedTasks.length /
+              (_completedTasks.length + _lateTasks.length)) *
+          100;
+    }
   }
 
   ///Sorts by priority
@@ -208,6 +223,12 @@ class TaskModel extends ChangeNotifier {
           TextButton(
             onPressed: () {
               _taskList.remove(taskItem);
+              // If date > due date, add to late tasks
+              if (DateTime.now().compareTo(taskItem.dueDate) > 0) {
+                _lateTasks.add(taskItem);
+              } else {
+                _completedTasks.add(taskItem);
+              }
               notifyListeners();
               Navigator.pop(context);
             },
