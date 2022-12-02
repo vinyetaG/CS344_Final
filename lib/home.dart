@@ -31,6 +31,11 @@ class _HomeState extends State<Home> {
     if (remainingTasks == 1 || remainingTasks == 0) {
       taskPlurality = 'tasks';
     }
+    
+    setState(() {
+      _calculateTasks();
+    });
+    
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('Home')),
@@ -65,6 +70,11 @@ class _HomeState extends State<Home> {
                         'You have completed $tasksCompleted% of tasks on time.')),
           ])),
     );
+  }
+  // Calculates # of remaining tasks and percentage of tasks completed on time
+  void _calculateTasks() {
+    remainingTasks = widget.taskModel.numTasks();
+    tasksCompleted = widget.taskModel.tasksOnTime();
   }
 }
 
