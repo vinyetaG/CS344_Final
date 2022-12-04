@@ -34,14 +34,14 @@ class _LoginScreenState extends State<LoginScreen> {
         appBar: AppBar(
             backgroundColor: Colors.transparent,
             flexibleSpace: Container(
-                decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.topRight,
-                  colors: [
-                    Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                    Theme.of(context).colorScheme.secondary.withOpacity(0.5),
-                  ]),
+              decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                  Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+                ]),
             )),
             actions: [
               IconButton(
