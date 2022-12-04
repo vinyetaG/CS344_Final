@@ -62,10 +62,12 @@ class TaskModel extends ChangeNotifier {
     const DropdownMenuItem(value: 2, child: Text("High")),
   ];
   
-  // Lists of tasks completed on time and late
-  final _completedTasks = <TaskItem>[];
-  final _lateTasks = <TaskItem>[];
-
+  // Lists of tasks completed
+  List<TaskItem> _completedTasks = <TaskItem>[];
+  
+  List<TaskItem> _onTimeTasks = <TaskItem>[];
+  List<TaskItem> _lateTasks = <TaskItem>[];
+ 
   ///Returns the task at the given index of the task list
   TaskItem getTask(int index) {
     return _taskList[index];
@@ -78,11 +80,12 @@ class TaskModel extends ChangeNotifier {
 
   ///Removes the given task
   void removeTask(int index) {
+    _completedTasks.add(getTask(index));
     _taskList.removeAt(index);
     notifyListeners();
   }
   
-  // Calculates the % of tasks completed on time
+  /// Calculates the % of tasks completed on time
   double tasksOnTime() {
     if (_lateTasks.isEmpty) {
       return 100;
@@ -91,6 +94,22 @@ class TaskModel extends ChangeNotifier {
               (_completedTasks.length + _lateTasks.length)) *
           100;
     }
+  }
+  
+  /// Returns number of tasks in the history of their app usage that were completed
+  int numCompletedTasks() {
+    return _completedTasks.length;
+  }
+  
+  /// Returns number of tasks that are currently overdue
+  int numOverdueTasks() {
+    int numTasksOverdue = 0;
+    for (TaskItem task in _taskList) {
+      if (DateTime.now().compareTo(task.dueDate) > 0) {
+        numTasksOverdue++;
+      }
+    }
+    return numTasksOverdue;
   }
 
   ///Sorts by priority
