@@ -25,6 +25,16 @@ class _TaskListState extends State<TaskList> {
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('To-Do List')),
+        flexibleSpace: Container(
+              decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                  Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+                ]),
+          )),
         actions: [
           //Popup menu that has sorting options
           PopupMenuButton<String>(
