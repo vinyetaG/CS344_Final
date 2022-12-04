@@ -12,69 +12,101 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  // TODO: Implement logic to display number of tasks completed
-  // TODO: Implement logic to calculate completion rate
-  double tasksCompleted = 0.0;
+  int tasksCompleted = 0;
   int remainingTasks = 0;
+  int overdueTasks = 0;
+  double completionRate = 0.0;
   User? user = FirebaseAuth.instance.currentUser;
   String welcomeString = 'Welcome back';
-  String taskPlurality = 'task';
 
+  // Get the correct grammatical form of "task(s)"
+  String getTaskPlurality({required int numTasks}) {
+    return (numTasks == 1) ? 'Task' : 'Tasks';
+  }
+
+  // Calculates # of remaining tasks and percentage of tasks completed on time
+  void _updateTaskStats() {
+    setState(() {
+      remainingTasks = widget.taskModel.numTasks();
+      tasksCompleted = widget.taskModel.numCompletedTasks();
+      completionRate = widget.taskModel.tasksOnTime();
+      overdueTasks = widget.taskModel.numOverdueTasks();
+    });
+    
   @override
-  Widget build(BuildContext context) {
+  void initState() {
     if (user != null) {
-      welcomeString += ' , ${user!.displayName}!';
+      welcomeString += ', ${user!.displayName}!';
     } else {
       welcomeString += '!';
     }
+    _updateTaskStats();
+    super.initState();
+  }
 
-    if (remainingTasks == 1 || remainingTasks == 0) {
-      taskPlurality = 'tasks';
-    }
+  @override
+  Widget build(BuildContext context) {
     
-    setState(() {
-      _calculateTasks();
-    });
+    // Task stats on rotation
+    List<Widget> carouselItems = [
+      carouselItemContainer(
+          context: context,
+          header: '$remainingTasks',
+          body: 'Remaining ${getTaskPlurality(numTasks: remainingTasks)}'),
+      carouselItemContainer(
+          context: context,
+          header: '$tasksCompleted',
+          body: '${getTaskPlurality(numTasks: tasksCompleted)} Completed'),
+      carouselItemContainer(
+          context: context,
+          header: '$overdueTasks',
+          body: 'Overdue ${getTaskPlurality(numTasks: overdueTasks)}'),
+    ];
+    
     
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('Home')),
+        flexibleSpace: Container(
+              decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                  Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+                ]),
+          )),
       ),
-      body: Container(
-          padding: const EdgeInsets.all(30),
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            customClock(context),
-            Padding(
-                padding: const EdgeInsets.symmetric(vertical: 30),
-                child: Text(
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 30, fontWeight: FontWeight.w600),
-                    welcomeString)),
-            Align(
-                key: null,
-                alignment: Alignment.centerLeft,
-                child: homeBoxesV1(
-                    context: context,
-                    header: 'Remaining Tasks',
-                    body:
-                        'You have $remainingTasks $taskPlurality to complete this week.')),
-            const SizedBox(height: 20),
-            Align(
-                key: null,
-                alignment: Alignment.centerRight,
-                child: homeBoxesV2(
-                    context: context,
-                    header: 'Completion Rate',
-                    body:
-                        'You have completed $tasksCompleted% of tasks on time.')),
-          ])),
-    );
-  }
-  // Calculates # of remaining tasks and percentage of tasks completed on time
-  void _calculateTasks() {
-    remainingTasks = widget.taskModel.numTasks();
-    tasksCompleted = widget.taskModel.tasksOnTime();
+      body: Center(
+            child: Padding(
+                padding: const EdgeInsets.all(30),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      /*customClock(context),*/
+                      Text(
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.w600),
+                          welcomeString),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          child: CarouselSlider(
+                              options: CarouselOptions(
+                                viewportFraction: 0.5,
+                                autoPlay: true,
+                                autoPlayInterval: const Duration(seconds: 2),
+                                enlargeCenterPage: true,
+                                clipBehavior: Clip.none,
+                                padEnds: true,
+                              ),
+                              items: carouselItems)),
+                      const SizedBox(height: 20),
+                      Text(
+                          'This week you have completed $completionRate% of tasks on time.'),
+                    ]))));
   }
 }
 
@@ -103,59 +135,31 @@ Widget customClock(BuildContext context) {
       ));
 }
 
-/// Box styling V1, used for remaining tasks
-Widget homeBoxesV1(
+Widget carouselItemContainer(
     {required BuildContext context,
     required String header,
     required String body}) {
   return Container(
-    height: MediaQuery.of(context).size.height * 0.18,
-    width: MediaQuery.of(context).size.width * 0.7,
-    padding: const EdgeInsets.fromLTRB(30, 15, 30, 30),
+    height: 200,
+    width: 200,
+    padding: const EdgeInsets.all(30),
     decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+        color: Colors.white.withOpacity(0.3),
+        shape: BoxShape.circle,
         border: Border.all(color: Colors.white)),
-    child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              textAlign: TextAlign.right,
-              header),
-          const SizedBox(height: 20),
-          Text(textAlign: TextAlign.center, body)
-        ]),
+    child: Stack(children: [
+      Align(
+        alignment: Alignment.topCenter,
+        child: Text(
+            style: const TextStyle(fontSize: 60, fontWeight: FontWeight.w800),
+            textAlign: TextAlign.center,
+            header),
+      ),
+      Align(
+          alignment: Alignment.bottomCenter,
+          child: Text(textAlign: TextAlign.center, body))
+    ]),
   );
 }
 
-/// Box styling V2, used for completion rate
-Widget homeBoxesV2(
-    {required BuildContext context,
-    required String header,
-    required String body}) {
-  return Container(
-    height: MediaQuery.of(context).size.height * 0.18,
-    width: MediaQuery.of(context).size.width * 0.7,
-    padding: const EdgeInsets.fromLTRB(30, 15, 30, 30),
-    decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(20), bottomLeft: Radius.circular(20)),
-        border: Border.all(color: Colors.white)),
-    child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              textAlign: TextAlign.right,
-              header),
-          const SizedBox(height: 20),
-          Text(textAlign: TextAlign.right, body)
-        ]),
-  );
-}
 
