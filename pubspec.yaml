@@ -45,6 +45,7 @@ dependencies:
   sliding_switch: ^1.1.0
   analog_clock:
   intl:
+  carousel_slider: ^4.1.1
 
 dev_dependencies:
   flutter_test:
