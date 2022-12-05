@@ -22,6 +22,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final GlobalKey<FormState> _loginKey = GlobalKey();
 
+  //TODO
+  void _initializeList() {}
+
   @override
   Widget build(BuildContext context) {
     // TextFormField sizing
@@ -32,16 +35,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
         appBar: AppBar(
+            title: const Center(child: Text('Login')),
             backgroundColor: Colors.transparent,
             flexibleSpace: Container(
-              decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-                colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                  Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-                ]),
+                decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: [
+                    Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+                  ]),
             )),
             actions: [
               IconButton(
@@ -173,10 +177,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                 // Login to account
                                 try {
+                                  print('test');
                                   await FirebaseAuth.instance
                                       .signInWithEmailAndPassword(
                                           email: _emailCtrl.text,
                                           password: _passwordCtrl.text);
+                                  await widget.taskModel
+                                      .initializeFields(widget.taskModel);
                                 } on FirebaseAuthException catch (e) {
                                   String loginError = e.message.toString();
                                   SnackBar errorMessage =

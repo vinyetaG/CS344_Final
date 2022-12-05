@@ -2,10 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'task_model.dart';
 import 'package:analog_clock/analog_clock.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class Home extends StatefulWidget {
   final TaskModel taskModel;
   const Home({required this.taskModel, Key? key}) : super(key: key);
+  // Task stats on rotation
 
   @override
   State<Home> createState() => _HomeState();
@@ -15,9 +17,11 @@ class _HomeState extends State<Home> {
   int tasksCompleted = 0;
   int remainingTasks = 0;
   int overdueTasks = 0;
-  double completionRate = 0.0;
+  String? completionRate;
   User? user = FirebaseAuth.instance.currentUser;
   String welcomeString = 'Welcome back';
+
+  static List<Widget> carouselItems = [];
 
   // Get the correct grammatical form of "task(s)"
   String getTaskPlurality({required int numTasks}) {
@@ -25,49 +29,42 @@ class _HomeState extends State<Home> {
   }
 
   // Calculates # of remaining tasks and percentage of tasks completed on time
-  void _updateTaskStats() {
-    setState(() {
-      remainingTasks = widget.taskModel.numTasks();
-      tasksCompleted = widget.taskModel.numCompletedTasks();
-      completionRate = widget.taskModel.tasksOnTime();
-      overdueTasks = widget.taskModel.numOverdueTasks();
-    });
-    
+
   @override
   void initState() {
+    super.initState();
     if (user != null) {
       welcomeString += ', ${user!.displayName}!';
     } else {
       welcomeString += '!';
     }
-    _updateTaskStats();
-    super.initState();
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    
-    // Task stats on rotation
-    List<Widget> carouselItems = [
+    remainingTasks = widget.taskModel.tasksDueThisWeek();
+    completionRate = widget.taskModel.tasksOnTimePct();
+    overdueTasks = widget.taskModel.tasksCurrOverdue();
+
+    carouselItems = [
       carouselItemContainer(
           context: context,
           header: '$remainingTasks',
-          body: 'Remaining ${getTaskPlurality(numTasks: remainingTasks)}'),
+          body: '${getTaskPlurality(numTasks: remainingTasks)} this week'),
       carouselItemContainer(
           context: context,
           header: '$tasksCompleted',
-          body: '${getTaskPlurality(numTasks: tasksCompleted)} Completed'),
+          body: '${getTaskPlurality(numTasks: tasksCompleted)} completed'),
       carouselItemContainer(
           context: context,
           header: '$overdueTasks',
           body: 'Overdue ${getTaskPlurality(numTasks: overdueTasks)}'),
     ];
-    
-    
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Center(child: Text('Home')),
-        flexibleSpace: Container(
+        appBar: AppBar(
+          title: const Center(child: Text('Home')),
+          flexibleSpace: Container(
               decoration: BoxDecoration(
             gradient: LinearGradient(
                 begin: Alignment.bottomLeft,
@@ -77,10 +74,10 @@ class _HomeState extends State<Home> {
                   Theme.of(context).colorScheme.secondary.withOpacity(0.7),
                 ]),
           )),
-      ),
-      body: Center(
+        ),
+        body: Center(
             child: Padding(
-                padding: const EdgeInsets.all(30),
+                padding: const EdgeInsets.symmetric(vertical: 30),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -92,20 +89,27 @@ class _HomeState extends State<Home> {
                           welcomeString),
                       const SizedBox(height: 20),
                       SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.25,
+                          width: MediaQuery.of(context).size.width,
                           child: CarouselSlider(
                               options: CarouselOptions(
                                 viewportFraction: 0.5,
                                 autoPlay: true,
-                                autoPlayInterval: const Duration(seconds: 2),
+                                autoPlayInterval: const Duration(seconds: 5),
                                 enlargeCenterPage: true,
-                                clipBehavior: Clip.none,
+                                clipBehavior: Clip.hardEdge,
                                 padEnds: true,
                               ),
                               items: carouselItems)),
                       const SizedBox(height: 20),
-                      Text(
-                          'This week you have completed $completionRate% of tasks on time.'),
+                      Text(completionRate == null
+                          ? 'Looks like you haven\'t completed any tasks yet.'
+                          : 'You have completed $completionRate% of tasks on time.'),
+                      Expanded(
+                          child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.425,
+                        child: customClock(context),
+                      ))
                     ]))));
   }
 }
@@ -151,7 +155,7 @@ Widget carouselItemContainer(
       Align(
         alignment: Alignment.topCenter,
         child: Text(
-            style: const TextStyle(fontSize: 60, fontWeight: FontWeight.w800),
+            style: const TextStyle(fontSize: 80, fontWeight: FontWeight.w800),
             textAlign: TextAlign.center,
             header),
       ),
@@ -161,5 +165,3 @@ Widget carouselItemContainer(
     ]),
   );
 }
-
-

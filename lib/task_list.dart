@@ -3,7 +3,9 @@
 import 'package:final_project/task_item.dart';
 import 'package:flutter/material.dart';
 import 'task_model.dart';
-import 'package:final_project/src/custom_widgets.dart';
+import 'package:final_project/src/custom.dart';
+
+enum SortOption { priority, name, date }
 
 class TaskList extends StatefulWidget {
   final TaskModel taskModel;
@@ -15,8 +17,21 @@ class TaskList extends StatefulWidget {
 }
 
 class _TaskListState extends State<TaskList> {
-  editTask(TaskItem taskItem) {
-    widget.taskModel.openTaskMenu(context, type: TaskMenu.edit);
+  //Sorts tasks by given option
+  void _sortBy(SortOption option) {
+    setState(() {
+      switch (option) {
+        case (SortOption.priority):
+          widget.taskModel.sortByPriority(context, widget.taskModel);
+          break;
+        case (SortOption.name):
+          widget.taskModel.sortByName(context, widget.taskModel);
+          break;
+        case (SortOption.date):
+          widget.taskModel.sortByDue(context, widget.taskModel);
+          break;
+      }
+    });
   }
 
   @override
@@ -24,48 +39,37 @@ class _TaskListState extends State<TaskList> {
     //ListView of tasks
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('To-Do List')),
+        title: const Center(child: Text('Tasks')),
         flexibleSpace: Container(
-              decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-                colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                  Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-                ]),
-          )),
+            decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              colors: [
+                Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+              ]),
+        )),
         actions: [
           //Popup menu that has sorting options
-          PopupMenuButton<String>(
+          PopupMenuButton<SortOption>(
               padding: EdgeInsets.only(right: 20),
               icon: Icon(Icons.menu),
-              onSelected: (String sortOption) {
-                setState(() {
-                  switch (sortOption) {
-                    case ('priority'):
-                      widget.taskModel.sortByPriority();
-                      break;
-                    case ('name'):
-                      widget.taskModel.sortByName();
-                      break;
-                    case ('date'):
-                      widget.taskModel.sortByDue();
-                      break;
-                  }
-                });
+              onSelected: (SortOption option) {
+                _sortBy(option);
               },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'priority',
+              itemBuilder: (BuildContext context) =>
+                  <PopupMenuEntry<SortOption>>[
+                    const PopupMenuItem<SortOption>(
+                      value: SortOption.priority,
                       child: Text('Sort by priority'),
                     ),
-                    const PopupMenuItem<String>(
-                      value: 'name',
+                    const PopupMenuItem<SortOption>(
+                      value: SortOption.name,
                       child: Text('Sort by name'),
                     ),
-                    const PopupMenuItem<String>(
-                      value: 'date',
+                    const PopupMenuItem<SortOption>(
+                      value: SortOption.date,
                       child: Text('Sort by due date'),
                     ),
                   ]),
@@ -81,35 +85,7 @@ class _TaskListState extends State<TaskList> {
             itemBuilder: (BuildContext context, int index) {
               TaskItem currTask = widget.taskModel.getTask(index);
               //List tile containing info for each task
-              return ListTile(
-                  onTap: (() => //Show full info on task
-                      widget.taskModel
-                          .openInfoPanel(context, taskItem: currTask)),
-                  //If task is overdue, red. Else darker green depending on priority
-                  tileColor: currTask.isOverdue
-                      ? TaskItem.tileColors[3]
-                      : TaskItem.tileColors[currTask.priority],
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  title: Text(
-                    currTask.name,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    currTask.description ?? '',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  leading: Checkbox(
-                      //If user checks off the item, prompt completion
-                      value: currTask.selected,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          currTask.selected = true;
-                        });
-                        widget.taskModel
-                            .confirmCompletion(context, taskItem: currTask);
-                      }),
-                  trailing: currTask.timer);
+              return currTask;
             },
             separatorBuilder: (BuildContext context, int index) {
               return Divider(
@@ -133,8 +109,8 @@ class _TaskListState extends State<TaskList> {
                     MediaQuery.of(context).size.width * 0.04,
                     MediaQuery.of(context).size.height * 0.03),
                 child: FloatingActionButton(
-                    onPressed: (() => widget.taskModel
-                        .openTaskMenu(context, type: TaskMenu.add)),
+                    onPressed: (() => widget.taskModel.openTaskMenu(context,
+                        taskModel: widget.taskModel, type: TaskMenu.add)),
                     child: Icon(Icons.add)),
               )),
         ),

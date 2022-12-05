@@ -18,10 +18,10 @@ ThemeData appTheme = ThemeData(
             fontSize: 28,
             fontWeight: FontWeight.bold)),
     checkboxTheme: CheckboxThemeData(
-        // ignore: body_might_complete_normally_nullable
         fillColor: MaterialStateProperty.resolveWith((var states) {
       if (states.contains(MaterialState.selected)) {
         return appTheme.colorScheme.primary;
       }
+      return null;
     })),
     scaffoldBackgroundColor: Colors.grey[800]);

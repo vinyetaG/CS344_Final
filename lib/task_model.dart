@@ -1,73 +1,22 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'task_item.dart';
-import 'package:final_project/src/custom_widgets.dart';
+import 'package:final_project/src/custom.dart';
 import 'package:intl/intl.dart';
 
 class TaskModel extends ChangeNotifier {
-  final _taskList = <TaskItem>[
-    TaskItem(
-        name: 'Task 1',
-        description: 'Task description',
-        priority: 0,
-        dueDate: DateTime.now().add(const Duration(days: 5))),
-    TaskItem(
-        name: 'Task 2',
-        description: 'Task description',
-        priority: 1,
-        dueDate: DateTime.now().add(const Duration(days: 10))),
-    TaskItem(
-        name: 'Zebra Task',
-        description: 'Task description',
-        priority: 2,
-        dueDate: DateTime.now().add(const Duration(days: 8))),
-    TaskItem(
-        name: 'Task 4',
-        description: 'Task description',
-        priority: 1,
-        dueDate: DateTime.now().add(const Duration(days: 7))),
-    TaskItem(
-        name: 'Alpha Task',
-        description: 'Task description',
-        priority: 0,
-        dueDate: DateTime.now().add(const Duration(days: 6))),
-    TaskItem(
-        name: 'Task 6',
-        description: 'Task description',
-        priority: 1,
-        dueDate: DateTime.now().add(const Duration(days: 5))),
-    TaskItem(
-        name: 'Task 7',
-        description: 'Task description',
-        priority: 2,
-        dueDate: DateTime.now().add(const Duration(days: 1))),
-    TaskItem(
-        name: 'Beta Task',
-        description: 'Task description',
-        priority: 1,
-        dueDate: DateTime.now().add(const Duration(days: 12))),
-    TaskItem(
-        name: 'Task 9',
-        description: 'Task description',
-        priority: 0,
-        dueDate: DateTime.now().add(const Duration(days: 12))),
-    TaskItem(
-        name: 'Task 10',
-        description: 'Task description',
-        priority: 1,
-        dueDate: DateTime.now().add(const Duration(days: 11)))
-  ];
+  final _taskList = <TaskItem>[];
   List<DropdownMenuItem<int>> priorityLevels = [
     const DropdownMenuItem(value: 0, child: Text("Low")),
     const DropdownMenuItem(value: 1, child: Text("Medium")),
     const DropdownMenuItem(value: 2, child: Text("High")),
   ];
-  
-  // Lists of tasks completed
-  List<TaskItem> _completedTasks = <TaskItem>[];
-  
-  List<TaskItem> _onTimeTasks = <TaskItem>[];
-  List<TaskItem> _lateTasks = <TaskItem>[];
- 
+  final taskDb = FirebaseFirestore.instance;
+  int _tasksCompleted = 0;
+  int _tasksOnTime = 0;
+
   ///Returns the task at the given index of the task list
   TaskItem getTask(int index) {
     return _taskList[index];
@@ -78,74 +27,168 @@ class TaskModel extends ChangeNotifier {
     return _taskList.length;
   }
 
-  ///Removes the given task
-  void removeTask(int index) {
-    _completedTasks.add(getTask(index));
-    _taskList.removeAt(index);
-    notifyListeners();
+  int completedTasks() {
+    return _tasksCompleted;
   }
-  
-  /// Calculates the % of tasks completed on time
-  double tasksOnTime() {
-    if (_lateTasks.isEmpty) {
-      return 100;
-    } else {
-      return (_completedTasks.length /
-              (_completedTasks.length + _lateTasks.length)) *
-          100;
-    }
-  }
-  
-  /// Returns number of tasks in the history of their app usage that were completed
-  int numCompletedTasks() {
-    return _completedTasks.length;
-  }
-  
-  /// Returns number of tasks that are currently overdue
-  int numOverdueTasks() {
-    int numTasksOverdue = 0;
-    for (TaskItem task in _taskList) {
-      if (DateTime.now().compareTo(task.dueDate) > 0) {
-        numTasksOverdue++;
+
+  int tasksCurrOverdue() {
+    int overdue = 0;
+    for (var taskItem in _taskList) {
+      if (DateTime.now().compareTo(taskItem.dueDate) > 0) {
+        overdue++;
       }
     }
-    return numTasksOverdue;
+    return overdue;
+  }
+
+  Future<void> initializeFields(TaskModel taskModel) async {
+    String username = FirebaseAuth.instance.currentUser!.displayName!;
+    var userDocs = await taskDb.collection(username).get();
+    var userData = userDocs.docs[0];
+
+    _tasksCompleted = userData['tasksCompleted'] ?? 0;
+    _tasksOnTime = userData['tasksOnTime'] ?? 0;
+    var tasks = userData['tasks'];
+
+    for (var task in tasks) {
+      String name = task['name'];
+      String description = task['description'];
+      int priority = task['priority'];
+      int dueDateMillis = task['dueDate'];
+      int secondsElapsed = task['secondsElapsed'];
+      bool timerRunning = task['timerRunning'];
+      int? timerStarted = task['timerStarted'];
+      _taskList.add(TaskItem(taskModel,
+          name: name,
+          description: description,
+          priority: priority,
+          dueDate: DateTime.fromMillisecondsSinceEpoch(dueDateMillis),
+          secondsElapsed: secondsElapsed,
+          timerRunning: timerRunning,
+          timerStarted: timerStarted));
+    }
+  }
+
+  ///Removes the given task
+  void _removeTask(TaskItem taskItem) {
+    _taskList.remove(taskItem);
+    notifyListeners();
   }
 
   ///Sorts by priority
-  void sortByPriority() {
+  void sortByPriority(BuildContext context, TaskModel taskModel) {
     _taskList.sort((a, b) => b.priority.compareTo(a.priority));
+    //Workaround for rebuilding each task item without making each a consumer
+    Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) =>
+              TasksApp(index: 0, taskModel: taskModel),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ));
     notifyListeners();
   }
 
-  ///Sorts by due date (TODO)
-  void sortByDue() {
+  ///Sorts by due date
+  void sortByDue(BuildContext context, TaskModel taskModel) {
     _taskList.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    //Workaround for rebuilding each task item without making each a consumer
+    Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) =>
+              TasksApp(index: 0, taskModel: taskModel),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ));
     notifyListeners();
   }
 
   ///Sorts by name
-  void sortByName() {
+  void sortByName(BuildContext context, TaskModel taskModel) {
     _taskList.sort((a, b) => a.name.compareTo(b.name));
-    notifyListeners();
+    //Workaround for rebuilding each task item without making each a consumer
+    Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) =>
+              TasksApp(index: 0, taskModel: taskModel),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ));
+  }
+
+  ///Return a string representing the percentage of tasks completed on time
+  String? tasksOnTimePct() {
+    if (_tasksCompleted == 0) {
+      return null;
+    }
+    return (_tasksOnTime / _tasksCompleted * 100).toStringAsFixed(1);
+  }
+
+  int tasksDueThisWeek() {
+    int taskCount = 0;
+    for (var taskItem in _taskList) {
+      DateTime weekFromNow = DateTime.now().add(const Duration(days: 7));
+      if (taskItem.dueDate.compareTo(weekFromNow) <= 0) {
+        taskCount++;
+      }
+    }
+    return taskCount;
+  }
+
+  ///Syncs data to user's account if they are signed in
+  void syncChanges() {
+    print('Saving...');
+    if (FirebaseAuth.instance.currentUser != null) {
+      String username = FirebaseAuth.instance.currentUser!.displayName!;
+      var tasks = <Map<String, dynamic>>[];
+
+      for (var taskItem in _taskList) {
+        var currTaskFields = {
+          'name': taskItem.name,
+          'description': taskItem.description,
+          'priority': taskItem.priority,
+          'dueDate': taskItem.dueDate.millisecondsSinceEpoch,
+          'timerStarted': taskItem.timerStarted,
+          'timerRunning': taskItem.timerRunning,
+          'secondsElapsed': taskItem.secondsElapsed
+        };
+        tasks.add(currTaskFields);
+      }
+      taskDb.collection(username).doc('data').set({'tasks': tasks});
+      taskDb
+          .collection(username)
+          .doc('data')
+          .update({'tasksCompleted': _tasksCompleted});
+      taskDb
+          .collection(username)
+          .doc('data')
+          .update({'tasksOnTime': _tasksOnTime});
+    }
+    print('saved.');
   }
 
   ///Adds a task
-  void _addTask(BuildContext context,
+  void addTask(TaskModel taskModel,
       {required String name,
       String? description,
       required int priority,
       required DateTime dueDate}) {
-    _taskList.add(TaskItem(
+    _taskList.add(TaskItem(taskModel,
         name: name,
         description: description,
         priority: priority,
         dueDate: dueDate));
   }
 
-  ///Displays information about the given task including the full description and due date (TODO)
-  ///Also allows the user to edit the task
-  Future<void> openInfoPanel(context, {required TaskItem taskItem}) async {
+  ///Displays information about the given task including the full description and due date
+  ///Also allows the user to edit the task, in which case return edited = true
+  Future<bool> openInfoPanel(context, {required TaskItem taskItem}) async {
+    bool edited = false;
+    String dateString = DateFormat('MM/dd/yyyy ').format(taskItem.dueDate);
+    dateString += _formatTime(taskItem.dueDate);
     await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -166,31 +209,45 @@ class TaskModel extends ChangeNotifier {
                         taskItem.description ?? "",
                         style: const TextStyle(color: Colors.black),
                       ),
-                      const SizedBox(height: 35),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          //Due date and timer
-                          Expanded(
-                            child: Text('Do by: ${taskItem.dueDate}',
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor)),
-                          ),
-                          taskItem.timer
-                        ],
-                      ),
+                      const SizedBox(height: 35), //whitespace
+                      //Due date
+                      Text('Do by: $dateString',
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).scaffoldBackgroundColor)),
                       const SizedBox(height: 20), //whitespace
                       //Edit menu
-                      ElevatedButton(
-                          onPressed: (() => openTaskMenu(context,
-                              type: TaskMenu.edit, taskItem: taskItem)),
-                          child: const Text('Edit Task'))
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                              onPressed: (() async {
+                                //Open edit menu and return that task was edited
+                                final navigator = Navigator.of(context);
+                                await openTaskMenu(context,
+                                    taskModel: taskItem.taskModel,
+                                    type: TaskMenu.edit,
+                                    taskItem: taskItem);
+                                edited = true;
+                                navigator.pop();
+                              }),
+                              child: const Text('Edit Task')),
+                          const SizedBox(width: 20), //whitespace
+                          ElevatedButton(
+                              onPressed: (() {
+                                taskItem.resetTimer();
+                                edited = true;
+                                Navigator.of(context).pop();
+                              }),
+                              child: const Text('Reset Timer'))
+                        ],
+                      )
                     ]),
                   ),
                 )
               ]);
         });
+    return edited;
   }
 
   ///Confirms that the user wants to remove a task from the list
@@ -209,9 +266,9 @@ class TaskModel extends ChangeNotifier {
           ),
           TextButton(
             onPressed: () {
-              _taskList.remove(taskItem);
+              _removeTask(taskItem);
               notifyListeners();
-              for (int i = 0; i < 3; i++) {
+              for (int i = 0; i < 2; i++) {
                 Navigator.pop(context);
               }
             },
@@ -223,9 +280,10 @@ class TaskModel extends ChangeNotifier {
   }
 
   ///Confirms that the user wants to complete the specified task
-  void confirmCompletion(BuildContext context, {required TaskItem taskItem}) {
+  Future<void> confirmCompletion(BuildContext context,
+      {required TaskItem taskItem}) async {
     String taskName = taskItem.name;
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: const Text('Complete Task'),
@@ -233,23 +291,26 @@ class TaskModel extends ChangeNotifier {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              taskItem.selected = false;
-              notifyListeners();
               Navigator.pop(context);
             },
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
-              _taskList.remove(taskItem);
-              // If date > due date, add to late tasks
-              if (DateTime.now().compareTo(taskItem.dueDate) > 0) {
-                _lateTasks.add(taskItem);
+              String taskName = taskItem.name;
+              String completionString;
+              if (DateTime.now().compareTo(taskItem.dueDate) < 0) {
+                completionString = '"$taskName" completed!';
+                _tasksOnTime++;
               } else {
-                _completedTasks.add(taskItem);
+                completionString = '"$taskName" completed late.';
               }
+              _tasksCompleted++;
+              _removeTask(taskItem);
               notifyListeners();
               Navigator.pop(context);
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(completionString)));
             },
             child: const Text('OK'),
           ),
@@ -258,6 +319,7 @@ class TaskModel extends ChangeNotifier {
     );
   }
 
+  ///Opens a date picker and return user's selection (or null if canceled)
   Future<DateTime?> _selectDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
         context: context,
@@ -296,6 +358,7 @@ class TaskModel extends ChangeNotifier {
     int? hour = int.tryParse(hourStr);
     int? minute = int.tryParse(minuteStr);
 
+    //Ensure hour and minute are inputted correctly
     if (hour == null || minute == null) {
       return null;
     }
@@ -304,6 +367,7 @@ class TaskModel extends ChangeNotifier {
       return null;
     }
 
+    //Convert to military time
     if (amOrPm == 'am') {
       if (hour == 12) {
         hour = 0;
@@ -322,7 +386,7 @@ class TaskModel extends ChangeNotifier {
     int currHour = time.hour;
     int currMin = time.minute;
     String currAmOrPm;
-    //Change hour and minutes to non-military time
+    //Change hour to non-military time
     if (currHour < 12) {
       currAmOrPm = 'AM';
       if (currHour == 0) {
@@ -335,10 +399,8 @@ class TaskModel extends ChangeNotifier {
       }
     }
 
-    String formattedMin = currMin.toString();
-    if (currMin < 10) {
-      formattedMin = '0$formattedMin';
-    }
+    String formattedMin = currMin.toString().padLeft(2, '0');
+
     formattedTime = '$currHour:$formattedMin $currAmOrPm';
     return formattedTime;
   }
@@ -346,19 +408,17 @@ class TaskModel extends ChangeNotifier {
   ///Opens pop up menu to either add or edit a task. If called to edit a task,
   ///taskItem must not be null
   Future<void> openTaskMenu(BuildContext context,
-      {required TaskMenu type, TaskItem? taskItem}) async {
+      {required TaskMenu type,
+      required TaskModel taskModel,
+      TaskItem? taskItem}) async {
     if (type == TaskMenu.edit && taskItem == null) {
       throw ArgumentError(
           "Edit menu was called without providing the task item to be edited.");
     }
     final formKey = GlobalKey<FormState>();
     String header, actionLabel;
-    String? newTaskName,
-        newTaskDescription,
-        currTaskName,
-        currTaskDescription,
-        timeShown;
-    int? newPriorityLevel, currPriorityLevel;
+    String? currTaskName, currTaskDescription, timeShown;
+    int? currPriorityLevel;
     DateTime? currDueDate;
     final dateController = TextEditingController();
     TimeOfDay? currTimeDue;
@@ -371,6 +431,7 @@ class TaskModel extends ChangeNotifier {
     } else {
       header = 'Edit Task';
       actionLabel = 'Save Changes';
+      //Initialize fields to display on form
       currTaskName = taskItem!.name;
       currTaskDescription = taskItem.description;
       currPriorityLevel = taskItem.priority;
@@ -432,10 +493,15 @@ class TaskModel extends ChangeNotifier {
                                 ),
                                 //If editing, show current name (else empty)
                                 initialValue: currTaskName,
-                                validator: (text) => text!.isEmpty
-                                    ? 'The task must be given a name.'
-                                    : null,
-                                onSaved: (text) => newTaskName = text,
+                                validator: (text) {
+                                  if (text!.isEmpty) {
+                                    return 'The task must be given a name.';
+                                  } else if (text.length > 60) {
+                                    return 'Task name can be at most 60 characters long.';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (text) => currTaskName = text,
                               ),
                               const SizedBox(height: 15), //whitespace
                               TextFormField(
@@ -447,7 +513,7 @@ class TaskModel extends ChangeNotifier {
                                 validator: (text) => text!.length > 150
                                     ? 'Description can be at most 150 characters long.'
                                     : null,
-                                onSaved: (text) => newTaskDescription = text,
+                                onSaved: (text) => currTaskDescription = text,
                               ),
                               const SizedBox(height: 15), //whitespace
                               Row(
@@ -463,10 +529,16 @@ class TaskModel extends ChangeNotifier {
                                         validator: (value) => value == null
                                             ? 'Please set a valid priority level\nfor this task.'
                                             : null,
-                                        //If editing...else empty
-                                        value: currPriorityLevel,
+                                        //If editing, show current priority or
+                                        //"high" priority if task is overdue.
+                                        //Else, null
+                                        value: currPriorityLevel != null
+                                            ? (currPriorityLevel! < 3
+                                                ? currPriorityLevel
+                                                : 2)
+                                            : null,
                                         onChanged: (int? newValue) {
-                                          newPriorityLevel = newValue!;
+                                          currPriorityLevel = newValue!;
                                         },
                                       ),
                                     ),
@@ -510,8 +582,8 @@ class TaskModel extends ChangeNotifier {
                                         MediaQuery.of(context).size.width * 0.4,
                                     child: TextFormField(
                                       decoration: const InputDecoration(
-                                        labelText: 'Time due',
-                                      ),
+                                          labelText: 'Time due',
+                                          hintText: 'H:MM AM/PM'),
                                       initialValue: timeShown,
                                       validator: (text) {
                                         TimeOfDay? timeInput =
@@ -543,24 +615,34 @@ class TaskModel extends ChangeNotifier {
                                       hours: currTimeDue!.hour,
                                       minutes: currTimeDue!.minute));
                                   if (type == TaskMenu.add) {
-                                    _addTask(context,
-                                        name: newTaskName!,
-                                        description: newTaskDescription,
-                                        priority: newPriorityLevel!,
+                                    addTask(taskModel,
+                                        name: currTaskName!,
+                                        description: currTaskDescription,
+                                        priority: currPriorityLevel!,
                                         dueDate: currDueDate!);
+                                    syncChanges();
                                     Navigator.pop(context);
                                     notifyListeners();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Task added.')));
                                   } else {
-                                    taskItem!.name =
-                                        newTaskName ?? currTaskName!;
-                                    taskItem.description = newTaskDescription ??
-                                        currTaskDescription!;
-                                    taskItem.priority =
-                                        newPriorityLevel ?? currPriorityLevel!;
+                                    taskItem!.name = currTaskName!;
+                                    taskItem.description = currTaskDescription!;
+                                    //If user did not modify priority level when overdue
+                                    //but changed due date, set to regular high priority
+                                    if (DateTime.now().compareTo(currDueDate!) <
+                                            0 &&
+                                        currPriorityLevel == 3) {
+                                      currPriorityLevel = 2;
+                                    }
+                                    taskItem.priority = currPriorityLevel!;
                                     taskItem.dueDate = currDueDate!;
+                                    syncChanges();
                                     Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    notifyListeners();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Task edited.')));
                                   }
                                 }
                               })),
