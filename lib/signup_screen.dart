@@ -14,13 +14,15 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignUpScreen> {
   static final GlobalKey<FormState> _signUpKey = GlobalKey();
+  
+  // Text Ediiting Controllers
+  TextEditingController nameCtrl = TextEditingController();
+  TextEditingController emailCtrl = TextEditingController();
+  TextEditingController passwordCtrl = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController nameCtrl = TextEditingController();
-    TextEditingController emailCtrl = TextEditingController();
-    TextEditingController passwordCtrl = TextEditingController();
-
     // Sizing variables
     double elementHeight = MediaQuery.of(context).size.height * 0.07;
     double elementWidth = MediaQuery.of(context).size.width * 0.6;
