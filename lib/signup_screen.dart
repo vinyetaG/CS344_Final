@@ -13,6 +13,8 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignUpScreen> {
+  static final GlobalKey<FormState> _signUpKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     TextEditingController nameCtrl = TextEditingController();
@@ -35,7 +37,7 @@ class _SignupScreenState extends State<SignUpScreen> {
               icon: const Icon(Icons.arrow_back),
               onPressed: () => Navigator.pop(context)),
         ),
-        body: Padding(
+        body: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Center(
               child: Column(
@@ -56,11 +58,13 @@ class _SignupScreenState extends State<SignUpScreen> {
                       height: MediaQuery.of(context).size.height * 0.45,
                       width: MediaQuery.of(context).size.width * 0.8,
                       child: signUpForm(
-                          context: context,
-                          taskModel: widget.taskModel,
-                          nameCtrl: nameCtrl,
-                          emailCtrl: emailCtrl,
-                          passwordCtrl: passwordCtrl),
+                        context: context,
+                        taskModel: widget.taskModel,
+                        nameCtrl: nameCtrl,
+                        emailCtrl: emailCtrl,
+                        passwordCtrl: passwordCtrl,
+                        key: _signUpKey,
+                      ),
                     ),
                   ]),
             )));
@@ -72,9 +76,9 @@ Widget signUpForm(
     required TaskModel taskModel,
     required TextEditingController nameCtrl,
     required TextEditingController emailCtrl,
-    required TextEditingController passwordCtrl}) {
+    required TextEditingController passwordCtrl,
+    required key}) {
   // ignore: no_leading_underscores_for_local_identifiers
-  GlobalKey<FormState> _signUpKey = GlobalKey();
 
   double elementHeight = MediaQuery.of(context).size.height * 0.07;
   double elementWidth = MediaQuery.of(context).size.width * 0.6;
@@ -82,7 +86,7 @@ Widget signUpForm(
   double leftPadding = 20;
 
   return Form(
-    key: _signUpKey,
+    key: key,
     child: Column(
       children: [
         Stack(alignment: Alignment.topCenter, children: [
@@ -201,8 +205,8 @@ Widget signUpForm(
             width: elementWidth,
             child: MaterialButton(
               onPressed: (() async {
-                if (_signUpKey.currentState!.validate()) {
-                  _signUpKey.currentState!.save();
+                if (key.currentState!.validate()) {
+                  key.currentState!.save();
 
                   // Login to account
                   try {
