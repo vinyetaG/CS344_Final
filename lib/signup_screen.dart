@@ -1,3 +1,4 @@
+import 'main.dart';
 import 'signed_in_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,18 +9,16 @@ class SignUpScreen extends StatefulWidget {
   const SignUpScreen({required this.taskModel, super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _SignupScreenState createState() => _SignupScreenState();
+  State<SignUpScreen> createState() => _SignupScreenState();
 }
 
 class _SignupScreenState extends State<SignUpScreen> {
   static final GlobalKey<FormState> _signUpKey = GlobalKey();
-  
-  // Text Ediiting Controllers
+
+  // Text Editing Controllers
   TextEditingController nameCtrl = TextEditingController();
   TextEditingController emailCtrl = TextEditingController();
   TextEditingController passwordCtrl = TextEditingController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +30,7 @@ class _SignupScreenState extends State<SignUpScreen> {
 
     return Scaffold(
         appBar: AppBar(
+          title: const Center(child: Text('Register')),
           flexibleSpace: Container(
               decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -200,6 +200,7 @@ class _SignupScreenState extends State<SignUpScreen> {
 
                                       // Login to account
                                       try {
+                                        var navigator = Navigator.of(context);
                                         await FirebaseAuth.instance
                                             .createUserWithEmailAndPassword(
                                                 email: emailCtrl.text,
@@ -208,27 +209,25 @@ class _SignupScreenState extends State<SignUpScreen> {
                                         User? user =
                                             FirebaseAuth.instance.currentUser;
                                         if (user != null) {
-                                          user.updateDisplayName(nameCtrl.text);
+                                          await user
+                                              .updateDisplayName(nameCtrl.text);
                                         }
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.of(context).push(
+                                        navigator.pop();
+                                        navigator.pushReplacement(
                                             MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SignedInScreen(
-                                                        taskModel:
-                                                            widget.taskModel)));
+                                                builder: (context) => TasksApp(
+                                                    routeIndex: 1,
+                                                    taskModel:
+                                                        widget.taskModel)));
                                       } on FirebaseAuthException catch (e) {
-                                        String loginError =
-                                            e.message.toString();
-
                                         SnackBar errorMessage = SnackBar(
                                             content: Text(e.toString()));
 
                                         if (e.toString().contains(
                                             'firebase_auth/email-already-in-use')) {
-                                          errorMessage = SnackBar(
+                                          errorMessage = const SnackBar(
                                               content: Text(
-                                                  '$loginError Please log-in instead.'));
+                                                  'Account already exists. Please log-in instead.'));
                                           Navigator.pop(context);
                                         }
 
@@ -412,31 +411,30 @@ Widget signUpForm(
               onPressed: (() async {
                 if (key.currentState!.validate()) {
                   key.currentState!.save();
-
                   // Login to account
                   try {
+                    var navigator = Navigator.of(context);
                     await FirebaseAuth.instance.createUserWithEmailAndPassword(
                         email: emailCtrl.text, password: passwordCtrl.text);
 
                     User? user = FirebaseAuth.instance.currentUser;
                     if (user != null) {
-                      user.updateDisplayName(nameCtrl.text);
+                      await user.updateDisplayName(nameCtrl.text);
                     }
-                    // ignore: use_build_context_synchronously
-                    Navigator.of(context).push(MaterialPageRoute(
+                    navigator.pop();
+                    navigator.pushReplacement(MaterialPageRoute(
                         builder: (context) =>
-                            SignedInScreen(taskModel: taskModel)));
+                            TasksApp(routeIndex: 1, taskModel: taskModel)));
                   } on FirebaseAuthException catch (e) {
-                    String loginError = e.message.toString();
-
                     SnackBar errorMessage =
                         SnackBar(content: Text(e.toString()));
 
                     if (e
                         .toString()
                         .contains('firebase_auth/email-already-in-use')) {
-                      errorMessage = SnackBar(
-                          content: Text('$loginError Please log-in instead.'));
+                      errorMessage = const SnackBar(
+                          content: Text(
+                              'Account already exists. Please log-in instead.'));
                       Navigator.pop(context);
                     }
 

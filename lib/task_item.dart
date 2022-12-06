@@ -10,7 +10,6 @@ class TaskItem extends StatefulWidget {
   String? description;
   int priority;
   DateTime dueDate;
-  final Stopwatch taskTimer = Stopwatch();
   int? timerStarted;
   bool timerRunning;
   int secondsElapsed;
@@ -31,7 +30,12 @@ class TaskItem extends StatefulWidget {
       required this.priority,
       this.timerRunning = false,
       this.secondsElapsed = 0,
-      this.timerStarted});
+      this.timerStarted}) {
+    if (priority > 3 || priority < 0) {
+      throw ArgumentError(
+          "Priority must be an integer between 0 and 2, or 3 if the task is to be considered overdue.");
+    }
+  }
 
   void resetTimer() {
     timerRunning = false;
@@ -50,13 +54,10 @@ class TaskItemState extends State<TaskItem> {
   Timer? overdueCheckTimer;
   Timer? timerIncrement;
 
+  //Initialize timers and timer display
   @override
   void initState() {
     super.initState();
-    // print(widget.timerRunning);
-    // print(widget.timerStarted);
-    // print(widget.secondsElapsed);
-
     //If not already overdue, check for overdue task when it shows up in the task list
     //then every 5 seconds
     if (widget.priority != 3) {
@@ -66,9 +67,9 @@ class TaskItemState extends State<TaskItem> {
     }
     //If task item's timer was running, keep counting time elapsed
     if (!widget.timerRunning) {
-      secondsToTimer(widget.secondsElapsed);
+      _secondsToTimer(widget.secondsElapsed);
     } else {
-      secondsToTimer(
+      _secondsToTimer(
           (DateTime.now().millisecondsSinceEpoch - widget.timerStarted!) ~/
               1000);
       //Update seconds elapsed to account for time elapsed since timer was canceled
@@ -76,12 +77,13 @@ class TaskItemState extends State<TaskItem> {
           (DateTime.now().millisecondsSinceEpoch - widget.timerStarted!) ~/
                   1000 -
               widget.secondsElapsed;
+      //Restart timer for timer display
       timerIncrement = Timer.periodic(
-          const Duration(seconds: 1), (timer) => incrementTimer());
+          const Duration(seconds: 1), (timer) => _incrementTimer());
     }
   }
 
-  //Checks if the task is overdue and marks it if so.
+  //Marks tasks as overdue if it is past the due date and returns whether it is overdue
   bool _checkOverdue() {
     if (DateTime.now().compareTo(widget.dueDate) > 0) {
       setState(() {
@@ -102,31 +104,31 @@ class TaskItemState extends State<TaskItem> {
   }
 
   //Increments the task's timer and updates the time shown
-  void incrementTimer() {
+  void _incrementTimer() {
     if (widget.timerRunning) {
       widget.secondsElapsed++;
-      secondsToTimer(//TODO
+      _secondsToTimer(
           (DateTime.now().millisecondsSinceEpoch - widget.timerStarted!) ~/
               1000);
     }
   }
 
   //Toggles between starting and stopping the task's timer.
-  void toggleTimer() {
+  void _toggleTimer() {
     if (widget.timerRunning) {
       timerIncrement!.cancel();
       widget.timerRunning = false;
     } else {
       timerIncrement = Timer.periodic(
-          const Duration(seconds: 1), (timer) => incrementTimer());
+          const Duration(seconds: 1), (timer) => _incrementTimer());
       widget.timerStarted =
           DateTime.now().millisecondsSinceEpoch - widget.secondsElapsed * 1000;
       widget.timerRunning = true;
     }
   }
 
-  //Formats the number of seconds elapsed using DateTime operations into H:MM:SS format
-  void secondsToTimer(int secondsElapsed) {
+  //Formats the number of seconds elapsed into H:MM:SS format
+  void _secondsToTimer(int secondsElapsed) {
     int hours = secondsElapsed ~/ 3600;
     int minutes = (secondsElapsed - (hours * 3600)) ~/ 60;
     int seconds = (secondsElapsed - (hours * 3600) - (minutes * 60));
@@ -193,7 +195,7 @@ class TaskItemState extends State<TaskItem> {
         //Toggleable stopwatch/timer
         trailing: TextButton(
             onPressed: () => setState(() {
-                  toggleTimer();
+                  _toggleTimer();
                 }),
             child: Text(
               timerText ?? '0:00:00',

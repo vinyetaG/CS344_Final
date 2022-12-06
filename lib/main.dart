@@ -1,14 +1,15 @@
 import 'dart:async';
+import 'package:final_project/signed_in_screen.dart';
 import 'package:final_project/src/themedata.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'login_screen.dart';
 import 'src/firebase_options.dart';
 import 'task_list.dart';
 import 'home.dart';
 import 'task_model.dart';
-import 'profile_launch_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,8 +29,8 @@ void main() async {
 
 class TasksApp extends StatefulWidget {
   final TaskModel taskModel;
-  final int? index;
-  const TasksApp({super.key, this.index, required this.taskModel});
+  final int? routeIndex;
+  const TasksApp({super.key, this.routeIndex, required this.taskModel});
 
   @override
   State<TasksApp> createState() => _TasksAppState();
@@ -37,7 +38,7 @@ class TasksApp extends StatefulWidget {
 
 class _TasksAppState extends State<TasksApp> {
   int selectedIndex = 0;
-  late Timer syncTimer;
+  Timer? syncTimer;
 
   List<Widget> tabViews = [
     //Change these later to accomodate signed in route
@@ -48,76 +49,31 @@ class _TasksAppState extends State<TasksApp> {
       return Home(taskModel: taskModel);
     }),
     Consumer<TaskModel>(builder: (context, taskModel, child) {
-      return ProfileLaunchScreen(taskModel: taskModel);
+      return LoginScreen(taskModel: taskModel);
     }),
   ];
 
+  //Initializes navigation and sync timer based on login state
   @override
   void initState() {
-    selectedIndex = widget.index ?? 0;
-    if (widget.index == null) {
-      //syncTimer = Timer.periodic(const Duration(seconds: 5),
-      //    (timer) => widget.taskModel.syncChanges());
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {}
-      super.initState();
-      widget.taskModel.addTask(widget.taskModel,
-          name: 'ZBC',
-          description: 'Task description 1',
-          priority: 0,
-          dueDate: DateTime.now().add(const Duration(seconds: 3)));
-      widget.taskModel.addTask(widget.taskModel,
-          name: 'CBA',
-          description: 'Task description 2',
-          priority: 2,
-          dueDate: DateTime.now().add(const Duration(seconds: 20)));
-      widget.taskModel.addTask(widget.taskModel,
-          name: 'MBE',
-          description: 'Task description 3',
-          priority: 1,
-          dueDate: DateTime.now().add(const Duration(days: 2)));
+    super.initState();
+    selectedIndex = widget.routeIndex ?? 1;
+    User? user = FirebaseAuth.instance.currentUser;
+    //If user is logged in, change login page to signed in screen and start sync timer
+    if (user != null) {
+      tabViews[2] = Consumer<TaskModel>(builder: (context, taskModel, child) {
+        return SignedInScreen(taskModel: taskModel);
+      });
+      syncTimer = Timer.periodic(const Duration(seconds: 5),
+          (timer) => widget.taskModel.syncChanges());
     }
+  }
 
-    // TaskItem(
-    //     name: 'Zebra Task',
-    //     description: 'Task description',
-    //     priority: 2,
-    //     dueDate: DateTime.now().add(const Duration(seconds: -10))),
-    // TaskItem(
-    //     name: 'Task 4',
-    //     description: 'Task description',
-    //     priority: 1,
-    //     dueDate: DateTime.now().add(const Duration(seconds: 30))),
-    // TaskItem(
-    //     name: 'Alpha Task',
-    //     description: 'Task description',
-    //     priority: 0,
-    //     dueDate: DateTime.now().add(const Duration(days: 6))),
-    // TaskItem(
-    //     name: 'Task 6',
-    //     description: 'Task description',
-    //     priority: 1,
-    //     dueDate: DateTime.now().add(const Duration(days: 5))),
-    // TaskItem(
-    //     name: 'Task 7',
-    //     description: 'Task description',
-    //     priority: 2,
-    //     dueDate: DateTime.now().add(const Duration(days: 1))),
-    // TaskItem(
-    //     name: 'Beta Task',
-    //     description: 'Task description',
-    //     priority: 1,
-    //     dueDate: DateTime.now().add(const Duration(days: 12))),
-    // TaskItem(
-    //     name: 'Task 9',
-    //     description: 'Task description',
-    //     priority: 0,
-    //     dueDate: DateTime.now().add(const Duration(days: 12))),
-    // TaskItem(
-    //     name: 'Task 10',
-    //     description: 'Task description',
-    //     priority: 1,
-    //     dueDate: DateTime.now().add(const Duration(days: 11)))
+  //Cancels autosave timer
+  @override
+  void dispose() {
+    super.dispose();
+    syncTimer?.cancel();
   }
 
   void _handleTap(int index) {

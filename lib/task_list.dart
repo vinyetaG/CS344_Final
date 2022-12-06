@@ -1,39 +1,18 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables
-
 import 'package:final_project/task_item.dart';
 import 'package:flutter/material.dart';
 import 'task_model.dart';
 import 'package:final_project/src/custom.dart';
 
-enum SortOption { priority, name, date }
-
 class TaskList extends StatefulWidget {
   final TaskModel taskModel;
 
-  TaskList({required this.taskModel, Key? key}) : super(key: key);
+  const TaskList({required this.taskModel, Key? key}) : super(key: key);
 
   @override
   State<TaskList> createState() => _TaskListState();
 }
 
 class _TaskListState extends State<TaskList> {
-  //Sorts tasks by given option
-  void _sortBy(SortOption option) {
-    setState(() {
-      switch (option) {
-        case (SortOption.priority):
-          widget.taskModel.sortByPriority(context, widget.taskModel);
-          break;
-        case (SortOption.name):
-          widget.taskModel.sortByName(context, widget.taskModel);
-          break;
-        case (SortOption.date):
-          widget.taskModel.sortByDue(context, widget.taskModel);
-          break;
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     //ListView of tasks
@@ -53,10 +32,11 @@ class _TaskListState extends State<TaskList> {
         actions: [
           //Popup menu that has sorting options
           PopupMenuButton<SortOption>(
-              padding: EdgeInsets.only(right: 20),
-              icon: Icon(Icons.menu),
+              padding: const EdgeInsets.only(right: 20),
+              icon: const Icon(Icons.menu),
               onSelected: (SortOption option) {
-                _sortBy(option);
+                widget.taskModel
+                    .sortByType(context, widget.taskModel, type: option);
               },
               itemBuilder: (BuildContext context) =>
                   <PopupMenuEntry<SortOption>>[
@@ -111,7 +91,7 @@ class _TaskListState extends State<TaskList> {
                 child: FloatingActionButton(
                     onPressed: (() => widget.taskModel.openTaskMenu(context,
                         taskModel: widget.taskModel, type: TaskMenu.add)),
-                    child: Icon(Icons.add)),
+                    child: const Icon(Icons.add)),
               )),
         ),
       ]),

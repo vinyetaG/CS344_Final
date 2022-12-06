@@ -20,6 +20,7 @@ class _HomeState extends State<Home> {
   String? completionRate;
   User? user = FirebaseAuth.instance.currentUser;
   String welcomeString = 'Welcome back';
+  late String completionRateStr;
 
   static List<Widget> carouselItems = [];
 
@@ -33,15 +34,11 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    if (user != null) {
-      welcomeString += ', ${user!.displayName}!';
-    } else {
-      welcomeString += '!';
-    }
 
     remainingTasks = widget.taskModel.tasksDueThisWeek();
     completionRate = widget.taskModel.tasksOnTimePct();
     overdueTasks = widget.taskModel.tasksCurrOverdue();
+    tasksCompleted = widget.taskModel.completedTasks();
 
     carouselItems = [
       carouselItemContainer(
@@ -57,6 +54,19 @@ class _HomeState extends State<Home> {
           header: '$overdueTasks',
           body: 'Overdue ${getTaskPlurality(numTasks: overdueTasks)}'),
     ];
+
+    if (completionRate != null) {
+      completionRateStr =
+          'You have completed $completionRate% of tasks on time.';
+    } else {
+      completionRateStr = 'Looks like you haven\'t completed any tasks yet.';
+    }
+    if (user != null) {
+      welcomeString += ', ${user!.displayName}!';
+    } else {
+      welcomeString += '!';
+      completionRateStr += '\nRegister now to sync data across sessions.';
+    }
   }
 
   @override
@@ -102,9 +112,10 @@ class _HomeState extends State<Home> {
                               ),
                               items: carouselItems)),
                       const SizedBox(height: 20),
-                      Text(completionRate == null
-                          ? 'Looks like you haven\'t completed any tasks yet.'
-                          : 'You have completed $completionRate% of tasks on time.'),
+                      Text(
+                        completionRateStr,
+                        textAlign: TextAlign.center,
+                      ),
                       Expanded(
                           child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.425,
