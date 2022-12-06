@@ -43,11 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     Theme.of(context).colorScheme.secondary.withOpacity(0.7),
                   ]),
             )),
-            actions: [
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.question_mark_rounded))
-            ]),
         body: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
                 30, MediaQuery.of(context).size.height * 0.2, 30, 30),
