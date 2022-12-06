@@ -195,56 +195,67 @@ class TaskModel extends ChangeNotifier {
           return SimpleDialog(
               insetPadding: const EdgeInsets.all(0),
               backgroundColor: Theme.of(context).colorScheme.secondary,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30)),
               children: [
-                SizedBox(
+                Container(
                   width: MediaQuery.of(context).size.width * 0.75,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 24.0),
-                    child: Column(children: [
-                      //Name and description
-                      Text(taskItem.name,
-                          style: Theme.of(context).textTheme.titleLarge),
-                      Text(
-                        taskItem.description ?? "",
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                      const SizedBox(height: 35), //whitespace
-                      //Due date
-                      Text('Do by: $dateString',
-                          style: TextStyle(
-                              color:
-                                  Theme.of(context).scaffoldBackgroundColor)),
-                      const SizedBox(height: 20), //whitespace
-                      //Edit menu
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                              onPressed: (() async {
-                                //Open edit menu and return that task was edited
-                                final navigator = Navigator.of(context);
-                                await openTaskMenu(context,
-                                    taskModel: taskItem.taskModel,
-                                    type: TaskMenu.edit,
-                                    taskItem: taskItem);
-                                edited = true;
-                                navigator.pop();
-                              }),
-                              child: const Text('Edit Task')),
-                          const SizedBox(width: 20), //whitespace
-                          ElevatedButton(
-                              onPressed: (() {
-                                taskItem.resetTimer();
-                                edited = true;
-                                Navigator.of(context).pop();
-                              }),
-                              child: const Text('Reset Timer'))
-                        ],
-                      )
-                    ]),
-                  ),
-                )
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 24.0),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        //Name and description
+                        Text(taskItem.name,
+                            style: Theme.of(context).textTheme.titleLarge),
+                        Text(
+                          taskItem.description ?? "",
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        const SizedBox(height: 35), //whitespace
+                        //Due date
+                        Text('Due: $dateString',
+                            style: TextStyle(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor)),
+                        const SizedBox(height: 20), //whitespace
+                        //Edit menu
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30))),
+                                onPressed: (() async {
+                                  //Open edit menu and return that task was edited
+                                  final navigator = Navigator.of(context);
+                                  await openTaskMenu(context,
+                                      taskModel: taskItem.taskModel,
+                                      type: TaskMenu.edit,
+                                      taskItem: taskItem);
+                                  edited = true;
+                                  navigator.pop();
+                                }),
+                                child: const Text('Edit Task')),
+                            const SizedBox(width: 20), //whitespace
+                            ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30))),
+                                onPressed: (() {
+                                  taskItem.resetTimer();
+                                  edited = true;
+                                  Navigator.of(context).pop();
+                                }),
+                                child: const Text('Reset Timer'))
+                          ],
+                        )
+                      ]),
+                ),
               ]);
         });
     return edited;
@@ -256,15 +267,37 @@ class TaskModel extends ChangeNotifier {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Remove Task'),
-        content: Text(
-            'Remove $taskName from your list? It will not be marked as completed.'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        backgroundColor: Colors.white.withOpacity(0.8),
+        title: const Text(textAlign: TextAlign.left, 'Remove Task'),
+        content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.15,
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text(
+                  textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 14),
+                  'Please note that this task will not be marked as completed.\n\n'),
+              Text(
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                  'Press confirm to finish deleting "$taskName"'),
+            ])),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text(
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                'Cancel'),
           ),
           TextButton(
+            style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30))),
             onPressed: () {
               _removeTask(taskItem);
               notifyListeners();
@@ -272,7 +305,12 @@ class TaskModel extends ChangeNotifier {
                 Navigator.pop(context);
               }
             },
-            child: const Text('OK'),
+            child: const Text(
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
+                'Confirm'),
           ),
         ],
       ),
@@ -286,16 +324,27 @@ class TaskModel extends ChangeNotifier {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        backgroundColor: Colors.white.withOpacity(0.8),
         title: const Text('Complete Task'),
-        content: Text('Mark "$taskName" as completed?'),
+        content: Text(
+            textAlign: TextAlign.left,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            'Press confirm to mark "$taskName" as completed.'),
         actions: <Widget>[
           TextButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text('Cancel'),
+            child: const Text(
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                'Cancel'),
           ),
           TextButton(
+            style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30))),
             onPressed: () {
               String taskName = taskItem.name;
               String completionString;
@@ -312,7 +361,12 @@ class TaskModel extends ChangeNotifier {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(completionString)));
             },
-            child: const Text('OK'),
+            child: const Text(
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
+                'Confirm'),
           ),
         ],
       ),
@@ -454,201 +508,206 @@ class TaskModel extends ChangeNotifier {
           return SimpleDialog(
             insetPadding: const EdgeInsets.all(0),
             backgroundColor: Theme.of(context).colorScheme.secondary,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             children: [
-              SizedBox(
+              Container(
                 width: MediaQuery.of(context).size.width,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 24, 24, 24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Row(
-                        children: [
-                          //Back arrow
+                padding: const EdgeInsets.fromLTRB(12, 24, 24, 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Row(
+                      children: [
+                        //Back arrow
+                        IconButton(
+                            onPressed: (() => Navigator.of(context).pop()),
+                            icon: const Icon(Icons.arrow_back_ios_new)),
+                        //Title
+                        Text(
+                          header,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        //Delete task button is shown if in the edit menu
+                        if (type == TaskMenu.edit) const Spacer(),
+                        if (type == TaskMenu.edit)
                           IconButton(
-                              onPressed: (() => Navigator.of(context).pop()),
-                              icon: const Icon(Icons.arrow_back_ios_new)),
-                          //Title
-                          Text(
-                            header,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          //Delete task button is shown if in the edit menu
-                          if (type == TaskMenu.edit) const Spacer(),
-                          if (type == TaskMenu.edit)
-                            IconButton(
-                                onPressed: (() => _confirmRemoval(context,
-                                    taskItem: taskItem!)),
-                                icon: const Icon(Icons.delete)),
-                        ],
-                      ),
-                      //Gets task data from form
-                      Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                decoration: const InputDecoration(
-                                  labelText: 'Task name',
-                                ),
-                                //If editing, show current name (else empty)
-                                initialValue: currTaskName,
-                                validator: (text) {
-                                  if (text!.isEmpty) {
-                                    return 'The task must be given a name.';
-                                  } else if (text.length > 60) {
-                                    return 'Task name can be at most 60 characters long.';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (text) => currTaskName = text,
+                              onPressed: (() => _confirmRemoval(context,
+                                  taskItem: taskItem!)),
+                              icon: const Icon(size: 40, Icons.delete_forever)),
+                      ],
+                    ),
+                    //Gets task data from form
+                    Form(
+                        key: formKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                labelText: 'Task name',
                               ),
-                              const SizedBox(height: 15), //whitespace
-                              TextFormField(
-                                decoration: const InputDecoration(
-                                  labelText: 'Task description (optional)',
-                                ),
-                                //If editing, show current description (else empty)
-                                initialValue: currTaskDescription,
-                                validator: (text) => text!.length > 150
-                                    ? 'Description can be at most 150 characters long.'
-                                    : null,
-                                onSaved: (text) => currTaskDescription = text,
+                              //If editing, show current name (else empty)
+                              initialValue: currTaskName,
+                              validator: (text) {
+                                if (text!.isEmpty) {
+                                  return 'The task must be given a name.';
+                                } else if (text.length > 60) {
+                                  return 'Task name can be at most 60 characters long.';
+                                }
+                                return null;
+                              },
+                              onSaved: (text) => currTaskName = text,
+                            ),
+                            const SizedBox(height: 15), //whitespace
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                labelText: 'Task description (optional)',
                               ),
-                              const SizedBox(height: 15), //whitespace
-                              Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.4,
-                                      child: DropdownButtonFormField<int>(
-                                        hint: const Text('Priority level'),
-                                        items: priorityLevels,
-                                        validator: (value) => value == null
-                                            ? 'Please set a valid priority level\nfor this task.'
-                                            : null,
-                                        //If editing, show current priority or
-                                        //"high" priority if task is overdue.
-                                        //Else, null
-                                        value: currPriorityLevel != null
-                                            ? (currPriorityLevel! < 3
-                                                ? currPriorityLevel
-                                                : 2)
-                                            : null,
-                                        onChanged: (int? newValue) {
-                                          currPriorityLevel = newValue!;
-                                        },
-                                      ),
-                                    ),
-                                    SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4,
-                                        child: TextFormField(
-                                          decoration: const InputDecoration(
-                                            labelText: 'Due date',
-                                          ),
-                                          controller: dateController,
-                                          onTap: () async {
-                                            //Stop keyboard from appearing
-                                            FocusScope.of(context)
-                                                .requestFocus(FocusNode());
-                                            //Assign due date to selection in date
-                                            //picker. If canceled, don't change.
-                                            currDueDate =
-                                                await _selectDate(context) ??
-                                                    currDueDate;
-                                            if (currDueDate != null) {
-                                              dateController.text =
-                                                  DateFormat('MM/dd/yyyy')
-                                                      .format(currDueDate!);
-                                            }
-                                          },
-                                          validator: ((value) {
-                                            if (currDueDate == null ||
-                                                dateController.text.isEmpty) {
-                                              return 'Please select a valid date.';
-                                            }
-                                            return null;
-                                          }),
-                                        )),
-                                  ]),
-                              Row(children: [
-                                const Spacer(),
-                                SizedBox(
+                              //If editing, show current description (else empty)
+                              initialValue: currTaskDescription,
+                              validator: (text) => text!.length > 150
+                                  ? 'Description can be at most 150 characters long.'
+                                  : null,
+                              onSaved: (text) => currTaskDescription = text,
+                            ),
+                            const SizedBox(height: 15), //whitespace
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
                                     width:
                                         MediaQuery.of(context).size.width * 0.4,
-                                    child: TextFormField(
-                                      decoration: const InputDecoration(
-                                          labelText: 'Time due',
-                                          hintText: 'H:MM AM/PM'),
-                                      initialValue: timeShown,
-                                      validator: (text) {
-                                        TimeOfDay? timeInput =
-                                            _stringToTime(text!);
-                                        if (timeInput == null) {
-                                          return 'Please enter time in the\nform H:MM am/pm';
-                                        }
-                                        return null;
+                                    child: DropdownButtonFormField<int>(
+                                      hint: const Text('Priority level'),
+                                      items: priorityLevels,
+                                      validator: (value) => value == null
+                                          ? 'Please set a valid priority level\nfor this task.'
+                                          : null,
+                                      //If editing, show current priority or
+                                      //"high" priority if task is overdue.
+                                      //Else, null
+                                      value: currPriorityLevel != null
+                                          ? (currPriorityLevel! < 3
+                                              ? currPriorityLevel
+                                              : 2)
+                                          : null,
+                                      onChanged: (int? newValue) {
+                                        currPriorityLevel = newValue!;
                                       },
-                                      onSaved: (text) =>
-                                          currTimeDue = _stringToTime(text!),
-                                    ))
-                              ]),
-                              const SizedBox(height: 30), //whitespace
-                            ],
-                          )),
-                      Container(
-                          //Add/update task button
-                          color: Theme.of(context).colorScheme.primary,
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          height: MediaQuery.of(context).size.width * 0.10,
-                          child: ElevatedButton(
-                              onPressed: ((() {
-                                //If fields are valid, add task or edit fields accordingly.
-                                if (formKey.currentState!.validate()) {
-                                  formKey.currentState!.save();
-                                  //Readd the time due to the due date
-                                  currDueDate = currDueDate!.add(Duration(
-                                      hours: currTimeDue!.hour,
-                                      minutes: currTimeDue!.minute));
-                                  if (type == TaskMenu.add) {
-                                    addTask(taskModel,
-                                        name: currTaskName!,
-                                        description: currTaskDescription,
-                                        priority: currPriorityLevel!,
-                                        dueDate: currDueDate!);
-                                    syncChanges();
-                                    Navigator.pop(context);
-                                    notifyListeners();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text('Task added.')));
-                                  } else {
-                                    taskItem!.name = currTaskName!;
-                                    taskItem.description = currTaskDescription!;
-                                    //If user did not modify priority level when overdue
-                                    //but changed due date, set to regular high priority
-                                    if (DateTime.now().compareTo(currDueDate!) <
-                                            0 &&
-                                        currPriorityLevel == 3) {
-                                      currPriorityLevel = 2;
-                                    }
-                                    taskItem.priority = currPriorityLevel!;
-                                    taskItem.dueDate = currDueDate!;
-                                    syncChanges();
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text('Task edited.')));
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.4,
+                                      child: TextFormField(
+                                        decoration: const InputDecoration(
+                                          labelText: 'Due date',
+                                        ),
+                                        controller: dateController,
+                                        onTap: () async {
+                                          //Stop keyboard from appearing
+                                          FocusScope.of(context)
+                                              .requestFocus(FocusNode());
+                                          //Assign due date to selection in date
+                                          //picker. If canceled, don't change.
+                                          currDueDate =
+                                              await _selectDate(context) ??
+                                                  currDueDate;
+                                          if (currDueDate != null) {
+                                            dateController.text =
+                                                DateFormat('MM/dd/yyyy')
+                                                    .format(currDueDate!);
+                                          }
+                                        },
+                                        validator: ((value) {
+                                          if (currDueDate == null ||
+                                              dateController.text.isEmpty) {
+                                            return 'Please select a valid date.';
+                                          }
+                                          return null;
+                                        }),
+                                      )),
+                                ]),
+                            Row(children: [
+                              const Spacer(),
+                              SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  child: TextFormField(
+                                    decoration: const InputDecoration(
+                                        labelText: 'Time due',
+                                        hintText: 'H:MM AM/PM'),
+                                    initialValue: timeShown,
+                                    validator: (text) {
+                                      TimeOfDay? timeInput =
+                                          _stringToTime(text!);
+                                      if (timeInput == null) {
+                                        return 'Please enter time in the\nform H:MM am/pm';
+                                      }
+                                      return null;
+                                    },
+                                    onSaved: (text) =>
+                                        currTimeDue = _stringToTime(text!),
+                                  ))
+                            ]),
+                            const SizedBox(height: 30), //whitespace
+                          ],
+                        )),
+                    Container(
+                        //Add/update task button
+                        //color: Theme.of(context).colorScheme.primary,
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: MediaQuery.of(context).size.width * 0.10,
+                        decoration: BoxDecoration(
+                            //color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(30)),
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30))),
+                            onPressed: ((() {
+                              //If fields are valid, add task or edit fields accordingly.
+                              if (formKey.currentState!.validate()) {
+                                formKey.currentState!.save();
+                                //Readd the time due to the due date
+                                currDueDate = currDueDate!.add(Duration(
+                                    hours: currTimeDue!.hour,
+                                    minutes: currTimeDue!.minute));
+                                if (type == TaskMenu.add) {
+                                  addTask(taskModel,
+                                      name: currTaskName!,
+                                      description: currTaskDescription,
+                                      priority: currPriorityLevel!,
+                                      dueDate: currDueDate!);
+                                  syncChanges();
+                                  Navigator.pop(context);
+                                  notifyListeners();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Task added.')));
+                                } else {
+                                  taskItem!.name = currTaskName!;
+                                  taskItem.description = currTaskDescription!;
+                                  //If user did not modify priority level when overdue
+                                  //but changed due date, set to regular high priority
+                                  if (DateTime.now().compareTo(currDueDate!) <
+                                          0 &&
+                                      currPriorityLevel == 3) {
+                                    currPriorityLevel = 2;
                                   }
+                                  taskItem.priority = currPriorityLevel!;
+                                  taskItem.dueDate = currDueDate!;
+                                  syncChanges();
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Task edited.')));
                                 }
-                              })),
-                              child: Text(actionLabel)))
-                    ],
-                  ),
+                              }
+                            })),
+                            child: Text(actionLabel)))
+                  ],
                 ),
               ),
             ],
@@ -656,3 +715,4 @@ class TaskModel extends ChangeNotifier {
         });
   }
 }
+
