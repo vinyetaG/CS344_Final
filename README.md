@@ -4,5 +4,5 @@
 - [x] Paper Prototype (10/7/22)
 - [x] GUI Submission (10/31/22)
 - [x] 1/3 Submission (11/11/22)
-- [ ] Draft Submission (11/28/22)
+- [x] Draft Submission (11/28/22)
 - [ ] Final Submission (12/14/22)
