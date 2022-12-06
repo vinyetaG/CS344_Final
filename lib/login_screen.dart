@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Theme.of(context).colorScheme.primary.withOpacity(0.7),
                     Theme.of(context).colorScheme.secondary.withOpacity(0.7),
                   ]),
-            )),
+            )),),
         body: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
                 30, MediaQuery.of(context).size.height * 0.2, 30, 30),
