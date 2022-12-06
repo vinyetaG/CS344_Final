@@ -103,7 +103,7 @@ Widget signUpForm(
           ),
           Container(
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(left: leftPadding),
+              padding: EdgeInsets.only(top: 11, left: leftPadding),
               height: elementHeight * 1.5,
               width: elementWidth,
               child: TextFormField(
@@ -140,7 +140,7 @@ Widget signUpForm(
           ),
           Container(
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(left: leftPadding),
+              padding: EdgeInsets.only(top: 11, left: leftPadding),
               height: elementHeight * 1.5,
               width: elementWidth,
               child: TextFormField(
@@ -177,7 +177,7 @@ Widget signUpForm(
           ),
           Container(
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(left: leftPadding),
+              padding: EdgeInsets.only(top: 11, left: leftPadding),
               height: elementHeight * 1.5,
               width: elementWidth,
               child: TextFormField(
