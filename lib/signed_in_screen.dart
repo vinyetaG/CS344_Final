@@ -139,11 +139,12 @@ class _SignedInScreenState extends State<SignedInScreen> {
       required IconData icon,
       required String? body}) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.5,
-      child: Row(children: [
+      width: MediaQuery.of(context).size.width * 0.6,
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         Icon(color: Colors.white, icon),
         const SizedBox(width: 10),
-        Text(body!),
+        SizedBox(
+            width: MediaQuery.of(context).size.width * 0.4, child: Text(body!)),
       ]),
     );
   }
