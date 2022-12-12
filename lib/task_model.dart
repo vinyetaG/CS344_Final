@@ -666,4 +666,147 @@ class TaskModel extends ChangeNotifier {
           );
         });
   }
+  Future<void> openHelpMenu(BuildContext context,
+      {required TaskModel taskModel, TaskItem? taskItem}) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            insetPadding: const EdgeInsets.all(0),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "Help",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  ExpansionTile(
+                    title: const Text('Creating a task'),
+                    children: <Widget>[
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "Use the '+' icon in the bottom right corner to add a new task"),
+                          trailing: Image.asset(
+                              'lib/src/assets/images/addButton.png')),
+                      const Padding(padding: EdgeInsets.all(5)),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "Give your task a name and optional description"),
+                          leading: Image.asset(
+                              'lib/src/assets/images/taskName.png')),
+                      const Padding(padding: EdgeInsets.all(5)),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "Use the drop-down menu to assign a priority level"),
+                          trailing: Image.asset(
+                              'lib/src/assets/images/priority.png')),
+                      const Padding(padding: EdgeInsets.all(5)),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "Select a due date using the calendar widget, or manually input the date and time"),
+                          leading: Image.asset(
+                              'lib/src/assets/images/calendar.png')),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "Tap 'Create Task' and your task will now be displayed on the main page"),
+                          trailing:
+                              Image.asset('lib/src/assets/images/tasks.png')),
+                      const ListTile(
+                        visualDensity: VisualDensity(vertical: 4),
+                        title: Text(
+                            "Darker color indicates higher priority level. Overdue tasks will appear red"),
+                      )
+                    ],
+                  ),
+                  ExpansionTile(
+                    title: const Text('Editing and deleting tasks'),
+                    children: <Widget>[
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text("Tap on the task you want to edit"),
+                          trailing: Image.asset(
+                              'lib/src/assets/images/taskToEdit.png')),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text("Tap the 'Edit Task' button"),
+                          leading: Image.asset(
+                              'lib/src/assets/images/editButton.png')),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "If you wish to delete the task, tap on the trash can icon"),
+                          trailing:
+                              Image.asset('lib/src/assets/images/delete.png')),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "Once you've made your desired changes, tap on 'Save Changes'"),
+                          leading: Image.asset(
+                              'lib/src/assets/images/saveButton.png')),
+                    ],
+                  ),
+                  ExpansionTile(
+                    title: const Text('Completing a task'),
+                    children: <Widget>[
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "Select the checkbox of the task you are finished with"),
+                          trailing: Image.asset(
+                              'lib/src/assets/images/finishedTask.png')),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "Once prompted, tap 'OK' to complete your task and it will be removed from the list"),
+                          leading: Image.asset(
+                              'lib/src/assets/images/completeTask.png')),
+                    ],
+                  ),
+                  ExpansionTile(
+                    title: const Text('Using the timer'),
+                    children: <Widget>[
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "To begin timing your task, tap on the play/pause button next to the timer.\nTo pause the timer, tap the button again"),
+                          trailing: Image.asset(
+                              'lib/src/assets/images/playbutton.png')),
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "To reset the timer, open up the edit menu, then tap on 'Reset Timer'"),
+                          leading:
+                              Image.asset('lib/src/assets/images/reset.png')),
+                    ],
+                  ),
+                  ExpansionTile(
+                    title: const Text('Sorting tasks'),
+                    children: <Widget>[
+                      ListTile(
+                          visualDensity: const VisualDensity(vertical: 4),
+                          title: const Text(
+                              "To change the way your tasks are sorted, tap on the menu icon on the top right, then select your preferred sorting method"),
+                          trailing:
+                              Image.asset('lib/src/assets/images/sort.png')),
+                      const ListTile(
+                          visualDensity: VisualDensity(vertical: 4),
+                          title: Text(
+                              "Tasks can be sorted alphabetically, by due date, or by priority level"))
+                    ],
+                  ),
+                ],
+              )
+            ],
+          );
+        });
+  }
 }
