@@ -18,6 +18,12 @@ class _TaskListState extends State<TaskList> {
     //ListView of tasks
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon:
+              const Icon(Icons.question_mark_rounded),
+          onPressed: (() => widget.taskModel
+              .openHelpMenu(context, taskModel: widget.taskModel)),
+        ),
         title: const Center(child: Text('Tasks')),
         flexibleSpace: Container(
             decoration: BoxDecoration(
