@@ -42,6 +42,7 @@ class _HomeState extends State<Home> {
     remainingTasks = widget.taskModel.tasksDueThisWeek();
     completionRate = widget.taskModel.tasksOnTimePct();
     overdueTasks = widget.taskModel.tasksCurrOverdue();
+    tasksCompleted = widget.taskModel.completedTasks();
 
     carouselItems = [
       carouselItemContainer(
