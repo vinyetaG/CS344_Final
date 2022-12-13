@@ -20,7 +20,6 @@ class _HomeState extends State<Home> {
   String? completionRate;
   User? user = FirebaseAuth.instance.currentUser;
   String welcomeString = 'Welcome back';
-  late String completionRateStr;
 
   static List<Widget> carouselItems = [];
 
@@ -34,11 +33,15 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    if (user != null) {
+      welcomeString += ', ${user!.displayName}!';
+    } else {
+      welcomeString += '!';
+    }
 
     remainingTasks = widget.taskModel.tasksDueThisWeek();
     completionRate = widget.taskModel.tasksOnTimePct();
     overdueTasks = widget.taskModel.tasksCurrOverdue();
-    tasksCompleted = widget.taskModel.completedTasks();
 
     carouselItems = [
       carouselItemContainer(
@@ -54,19 +57,6 @@ class _HomeState extends State<Home> {
           header: '$overdueTasks',
           body: 'Overdue ${getTaskPlurality(numTasks: overdueTasks)}'),
     ];
-
-    if (completionRate != null) {
-      completionRateStr =
-          'You have completed $completionRate% of tasks on time.';
-    } else {
-      completionRateStr = 'Looks like you haven\'t completed any tasks yet.';
-    }
-    if (user != null) {
-      welcomeString += ', ${user!.displayName}!';
-    } else {
-      welcomeString += '!';
-      completionRateStr += '\nRegister now to sync data across sessions.';
-    }
   }
 
   @override
@@ -91,36 +81,35 @@ class _HomeState extends State<Home> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      /*customClock(context),*/
+                      Expanded(
+                          child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: customClock(context),
+                      )),
+                      const SizedBox(height: 20),
                       Text(
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               fontSize: 30, fontWeight: FontWeight.w600),
                           welcomeString),
+                      Text(completionRate == null
+                          ? 'Looks like you haven\'t completed any tasks yet.'
+                          : 'You have completed $completionRate% of tasks on time.'),
                       const SizedBox(height: 20),
                       SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.25,
-                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height * 0.35,
+                          width: MediaQuery.of(context).size.width * 0.7,
                           child: CarouselSlider(
                               options: CarouselOptions(
-                                viewportFraction: 0.5,
+                                scrollDirection: Axis.vertical,
+                                viewportFraction: 0.3,
                                 autoPlay: true,
                                 autoPlayInterval: const Duration(seconds: 5),
                                 enlargeCenterPage: true,
-                                clipBehavior: Clip.hardEdge,
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
                                 padEnds: true,
                               ),
                               items: carouselItems)),
-                      const SizedBox(height: 20),
-                      Text(
-                        completionRateStr,
-                        textAlign: TextAlign.center,
-                      ),
-                      Expanded(
-                          child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.425,
-                        child: customClock(context),
-                      ))
                     ]))));
   }
 }
@@ -133,7 +122,7 @@ Widget customClock(BuildContext context) {
       child: AnalogClock(
         decoration: BoxDecoration(
             border: Border.all(width: 2.0, color: Colors.white),
-            color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+            color: Colors.white.withOpacity(0.1),
             shape: BoxShape.circle),
         width: 100,
         isLive: true,
@@ -155,23 +144,23 @@ Widget carouselItemContainer(
     required String header,
     required String body}) {
   return Container(
-    height: 200,
-    width: 200,
-    padding: const EdgeInsets.all(30),
+    height: 100,
+    width: 100,
+    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
     decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.3),
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(30),
         border: Border.all(color: Colors.white)),
     child: Stack(children: [
       Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.centerLeft,
         child: Text(
-            style: const TextStyle(fontSize: 80, fontWeight: FontWeight.w800),
+            style: const TextStyle(fontSize: 50, fontWeight: FontWeight.w800),
             textAlign: TextAlign.center,
             header),
       ),
       Align(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.centerRight,
           child: Text(textAlign: TextAlign.center, body))
     ]),
   );
