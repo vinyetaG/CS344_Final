@@ -4,10 +4,12 @@ import 'task_model.dart';
 import 'package:analog_clock/analog_clock.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+/// Home is the "Dashboard" of the app. This is the first page that greets the users.
+/// Author: Olivia Ozbaki, Gerald Vinyeta
+/// Bugs: None that are apparent during testing
 class Home extends StatefulWidget {
   final TaskModel taskModel;
   const Home({required this.taskModel, Key? key}) : super(key: key);
-  // Task stats on rotation
 
   @override
   State<Home> createState() => _HomeState();
@@ -27,9 +29,7 @@ class _HomeState extends State<Home> {
   String getTaskPlurality({required int numTasks}) {
     return (numTasks == 1) ? 'Task' : 'Tasks';
   }
-
-  // Calculates # of remaining tasks and percentage of tasks completed on time
-
+  
   @override
   void initState() {
     super.initState();
@@ -38,12 +38,14 @@ class _HomeState extends State<Home> {
     } else {
       welcomeString += '!';
     }
-
+    
+    // Get carousel variables
     remainingTasks = widget.taskModel.tasksDueThisWeek();
     completionRate = widget.taskModel.tasksOnTimePct();
     overdueTasks = widget.taskModel.tasksCurrOverdue();
     tasksCompleted = widget.taskModel.completedTasks();
 
+    // Set carousel items
     carouselItems = [
       carouselItemContainer(
           context: context,
@@ -140,6 +142,7 @@ Widget customClock(BuildContext context) {
       ));
 }
 
+/// Container decoration for carousel items
 Widget carouselItemContainer(
     {required BuildContext context,
     required String header,
