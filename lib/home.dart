@@ -66,7 +66,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Center(child: Text('Home')),
+          title: const Center(child: Text('Dashboard')),
           flexibleSpace: Container(
               decoration: BoxDecoration(
             gradient: LinearGradient(
