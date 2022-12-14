@@ -269,6 +269,7 @@ class TaskModel extends ChangeNotifier {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         title: const Text('Remove Task'),
         content: Text(
             'Remove $taskName from your list? It will not be marked as completed.'),
@@ -299,6 +300,7 @@ class TaskModel extends ChangeNotifier {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         title: const Text('Complete Task'),
         content: Text('Mark "$taskName" as completed?'),
         actions: <Widget>[
@@ -467,6 +469,8 @@ class TaskModel extends ChangeNotifier {
           return SimpleDialog(
             insetPadding: const EdgeInsets.all(0),
             backgroundColor: Theme.of(context).colorScheme.secondary,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             children: [
               SizedBox(
                 width: MediaQuery.of(context).size.width,
